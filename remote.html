@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#111827" />
+<title>RVC Pocket Remote</title>
+<style>
+  :root {
+    --red:#c62828; --blue:#2f34b6; --navy:#111827; --ink:#f8fafc; --muted:#a8b0c5;
+    --card:#192033; --card2:#222b44; --gold:#f3b72b; --green:#22a35a; --bad:#d94a4a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#090d16,#12182a 55%,#0b1020);color:var(--ink)}
+  .app{width:min(100%,430px);margin:0 auto;padding:14px 12px 28px}
+  h1{font-size:28px;margin:8px 0 2px;text-align:center}
+  .tag{color:var(--muted);text-align:center;font-size:13px;margin-bottom:12px}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid rgba(255,255,255,.09);border-radius:24px;padding:16px;margin:12px 0;box-shadow:0 14px 35px rgba(0,0,0,.35)}
+  label{display:block;color:var(--muted);font-size:13px;margin:12px 0 6px}
+  input,select{width:100%;font-size:18px;color:var(--ink);background:#0f1525;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:13px 14px;outline:none}
+  button{width:100%;border:0;border-radius:22px;padding:20px 12px;font-weight:950;font-size:24px;color:white;background:#4b5563;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer;margin-top:10px}
+  button:active{transform:translateY(1px)}
+  .green{background:var(--green)}
+  .gold{background:var(--gold);color:#1a1302}
+  .bad{background:var(--bad)}
+  .blue{background:linear-gradient(135deg,var(--blue),#1f237d)}
+  .red{background:linear-gradient(135deg,var(--red),#8e1818)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid button{margin:0}
+  .big{font-size:30px;min-height:92px}
+  .small{font-size:15px;padding:14px}
+  .status{font-size:13px;color:#dbe4ff;margin-top:12px;min-height:20px;text-align:center}
+  .tiny{font-size:12px;color:var(--muted);line-height:1.4}
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>RVC Pocket Remote</h1>
+  <div class="tag">Tap bags from your phone/watch-side browser</div>
+
+  <div class="card">
+    <label>Game ID</label>
+    <input id="gameId" placeholder="RVC-..." />
+
+    <label>Player</label>
+    <select id="player">
+      <option value="P1">Player 1</option>
+      <option value="P2">Player 2</option>
+    </select>
+
+    <button class="blue small" onclick="saveSetup()">Save Remote Setup</button>
+    <div class="tiny">Tip: open from the main app’s Pocket Remote button and it should fill the Game ID automatically.</div>
+  </div>
+
+  <div class="card">
+    <div class="grid">
+      <button class="green big" onclick="sendCmd('IN')">IN<br>+3</button>
+      <button class="gold big" onclick="sendCmd('ON')">ON<br>+1</button>
+    </div>
+    <button class="bad big" onclick="sendCmd('OFF')">OFF +0</button>
+    <div class="grid">
+      <button class="blue small" onclick="sendCmd('UNDO')">UNDO</button>
+      <button class="red small" onclick="sendCmd('END')">END</button>
+    </div>
+    <div class="status" id="status">Ready.</div>
+  </div>
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwYE1RikwxPWIkJSMCuCvVzs5oCe2mAiCZJkUqOPGz2Ydy7qqF8oInfzNHtlzr8weLrwg/exec";
+const STORE_KEY = "rvcPocketRemote.v1";
+
+function getParams(){
+  const p = new URLSearchParams(location.search);
+  return {
+    gameId: p.get("gameId") || "",
+    player: p.get("player") || ""
+  };
+}
+
+function loadSetup(){
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); } catch(e) {}
+  const params = getParams();
+  document.getElementById("gameId").value = params.gameId || saved.gameId || "";
+  document.getElementById("player").value = params.player || saved.player || "P1";
+}
+
+function saveSetup(){
+  localStorage.setItem(STORE_KEY, JSON.stringify({
+    gameId: document.getElementById("gameId").value.trim(),
+    player: document.getElementById("player").value
+  }));
+  setStatus("Saved.");
+}
+
+function setStatus(msg){
+  document.getElementById("status").textContent = msg;
+}
+
+async function sendCmd(cmd){
+  const gameId = document.getElementById("gameId").value.trim();
+  const player = document.getElementById("player").value;
+  if(!gameId){
+    setStatus("Enter a Game ID first.");
+    return;
+  }
+  saveSetup();
+  const url = `${SCRIPT_URL}?gameId=${encodeURIComponent(gameId)}&player=${encodeURIComponent(player)}&cmd=${encodeURIComponent(cmd)}`;
+  setStatus(`Sending ${cmd}...`);
+  try {
+    await fetch(url, { method:"GET", mode:"no-cors" });
+    setStatus(`Sent ${cmd} at ${new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'})}`);
+  } catch(e) {
+    setStatus("Send failed. Try again.");
+  }
+}
+
+loadSetup();
+</script>
+</body>
+</html>

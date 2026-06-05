@@ -27,6 +27,7 @@
   .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
   button{border:0;border-radius:18px;padding:15px 12px;font-weight:900;font-size:17px;color:white;background:#4b5563;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer}
   button:active{transform:translateY(1px)}
+  button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
   .primary{background:linear-gradient(135deg,var(--rvc-red),#8e1818)}
   .secondary{background:linear-gradient(135deg,var(--rvc-blue),#1f237d)}
   .gold{background:var(--rvc-gold);color:#1a1302}.green{background:var(--rvc-green)}.bad{background:var(--rvc-bad)}.muted{background:#4b5563}
@@ -150,7 +151,7 @@
         <button class="secondary" onclick="showSetup()">Players</button>
         <button class="primary" onclick="resetGame()">Reset</button>
       </div>
-      <button class="green" style="width:100%;margin-top:10px" onclick="submitFinal()">Submit Final Game</button>
+      <button id="submitBtn" class="green" style="width:100%;margin-top:10px" onclick="submitFinal()">Submit Final Game</button>
       <div class="status" id="saveStatus">Auto-save ready.</div>
     </div>
 
@@ -167,7 +168,7 @@ const PREFS_KEY = 'rvcSanctuaryPractice.prefs.v4';
 const GAME_KEY = 'rvcSanctuaryPractice.activeGame.v4';
 const SUBMITTED_KEY = 'rvcSanctuaryPractice.submittedGames.v4';
 const PLAYERS_KEY = 'rvcSanctuaryPractice.players.v1';
-const SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbynjSCT3RQV3pBmzh8N3wpPGFdvP9ZdIfHj69uWw0r_NTFowo2pImG7-v_HXUaKvotxuQ/exec';
+const SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwYE1RikwxPWIkJSMCuCvVzs5oCe2mAiCZJkUqOPGz2Ydy7qqF8oInfzNHtlzr8weLrwg/exec';
 
 let opponentType='riley';
 let game = defaultGame();
@@ -177,6 +178,7 @@ function defaultGame(){
     gameId: makeGameId(),
     createdAt: new Date().toISOString(),
     submittedAt: null,
+    isSubmitted: false,
     mode:'singles',
     opponentType:'riley',
     ghostLevel:'6',
@@ -271,7 +273,7 @@ function savePrefs(){
 function saveGame(){
   localStorage.setItem(GAME_KEY, JSON.stringify(game));
   const stamp=new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'});
-  document.getElementById('saveStatus').textContent=`Saved locally at ${stamp}`;
+  document.getElementById('saveStatus').textContent = game.isSubmitted ? `Submitted and locked at ${stamp}` : `Saved locally at ${stamp}`;
 }
 function chooseRiley(){ opponentType='riley'; document.getElementById('humanOpponentBox').style.display='none'; }
 function chooseHuman(){ opponentType='human'; document.getElementById('humanOpponentBox').style.display='block'; refreshPlayerDropdowns(); }
@@ -323,12 +325,14 @@ function showSetup(){
   document.getElementById('setupScreen').classList.add('active');
 }
 function addBag(points, icon){
+  if(game.isSubmitted){ alert('This game has already been submitted. Start a new game to keep playing.'); return; }
   if(game.current.length>=4) return;
   game.current.push(points); game.currentIcons.push(icon);
   if(game.current.length===4) finishThrow();
   saveGame(); update();
 }
 function undoBag(){
+  if(game.isSubmitted){ alert('This game has already been submitted. Start a new game to make changes.'); return; }
   if(game.current.length===0) return;
   game.current.pop(); game.currentIcons.pop();
   saveGame(); update();
@@ -412,6 +416,11 @@ function update(){
   document.getElementById('turnHelp').textContent = game.inputSide===1 ? `${game.p1Name} turn. Tap each bag result.` : `${game.p2Name} turn. Tap each bag result.`;
   document.getElementById('currentBags').textContent = game.currentIcons.length ? game.currentIcons.join(' ') : '— — — —';
   renderRounds();
+  const submitBtn=document.getElementById('submitBtn');
+  if(submitBtn){
+    submitBtn.disabled=!!game.isSubmitted;
+    submitBtn.textContent=game.isSubmitted ? 'Game Submitted / Locked' : 'Submit Final Game';
+  }
 }
 function renderRounds(){
   const list=document.getElementById('roundList');
@@ -427,6 +436,7 @@ function renderRounds(){
   }).join('');
 }
 function editRound(index){
+  if(game.isSubmitted){ alert('This game has already been submitted and is locked.'); return; }
   const r=game.rounds[index];
   const parse = (txt) => {
     const vals = txt.split(',').map(x=>Number(x.trim())).filter(x=>[0,1,3].includes(x));
@@ -447,6 +457,10 @@ function editRound(index){
   saveGame(); update();
 }
 function resetGame(){
+  if(game.isSubmitted){
+    if(confirm('This game has already been submitted. Start a brand new game instead?')) newGame();
+    return;
+  }
   if(!confirm('Reset this active game?')) return;
   const p1Name=game.p1Name, p2Name=game.p2Name, p1Id=game.p1Id, p2Id=game.p2Id, opp=game.opponentType, lvl=game.ghostLevel;
   game=defaultGame();
@@ -454,6 +468,10 @@ function resetGame(){
   saveGame(); update();
 }
 async function submitFinal(){
+  if(game.isSubmitted){
+    alert('This game was already submitted. Start a new game before submitting again.');
+    return;
+  }
   if(!game.rounds.length){ alert('No completed rounds to submit yet.'); return; }
   const st=calcStats();
   const payload = {
@@ -464,13 +482,19 @@ async function submitFinal(){
     finalP2Stats: st.p2,
     p1PPR: Number(ppr(st.p1)),
     p2PPR: Number(ppr(st.p2)),
-    submittedAt: new Date().toISOString()
+    submittedAt: new Date().toISOString(),
+    isSubmitted: true
   };
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;
+  btn.textContent='Submitting...';
+
   const submitted=JSON.parse(localStorage.getItem(SUBMITTED_KEY)||'[]');
-  submitted.push(payload);
-  localStorage.setItem(SUBMITTED_KEY, JSON.stringify(submitted));
-  game.submittedAt=payload.submittedAt;
-  saveGame();
+  if(!submitted.some(g => g.gameId === payload.gameId)){
+    submitted.push(payload);
+    localStorage.setItem(SUBMITTED_KEY, JSON.stringify(submitted));
+  }
 
   try {
     await fetch(SHEET_WEB_APP_URL, {
@@ -479,11 +503,51 @@ async function submitFinal(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
     });
-    alert('Game saved locally and sent to Google Sheet.');
+
+    game.submittedAt=payload.submittedAt;
+    game.isSubmitted=true;
+    saveGame();
+    update();
+
+    const startNew = confirm('Game submitted to Google Sheet. Start a brand new game now?');
+    if(startNew){
+      newGameAfterSubmit();
+    }else{
+      alert('Game is locked so it cannot be submitted twice.');
+    }
   } catch(e) {
-    alert('Game saved locally, but Google Sheet submit failed.');
+    btn.disabled=false;
+    btn.textContent='Submit Final Game';
+    alert('Submit failed. The game is still saved locally and was not locked.');
   }
 }
+
+function newGameAfterSubmit(){
+  const keep = {
+    p1Id: game.p1Id,
+    p2Id: game.p2Id,
+    opponentType: game.opponentType,
+    ghostLevel: game.ghostLevel
+  };
+  game=defaultGame();
+  game.opponentType=keep.opponentType;
+  game.ghostLevel=keep.ghostLevel;
+  const players=getPlayers();
+  const p1=players.find(p=>p.id===keep.p1Id) || players[0];
+  const p2=keep.opponentType==='human'
+    ? (players.find(p=>p.id===keep.p2Id) || players[0])
+    : {id:'RILEY', name:'Riley 👻'};
+  game.p1Id=p1.id; game.p1Name=p1.name;
+  game.p2Id=p2.id; game.p2Name=p2.name;
+  saveGame();
+  showGame();
+}
+
+function openRemoteLink(){
+  const remoteUrl = `remote.html?gameId=${encodeURIComponent(game.gameId)}&player=P1`;
+  window.open(remoteUrl, '_blank');
+}
+
 loadPrefs();
 if(game && game.gameId){
   refreshPlayerDropdowns();

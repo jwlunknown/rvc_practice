@@ -7,12 +7,22 @@
 <title>RVC Sanctuary Practice</title>
 <style>
   :root{
-    --rvc-red:#c62828; --rvc-blue:#2f34b6; --rvc-navy:#111827; --rvc-ink:#f8fafc;
-    --rvc-muted:#a8b0c5; --rvc-card:#192033; --rvc-card2:#222b44; --rvc-gold:#f3b72b;
-    --rvc-green:#22a35a; --rvc-bad:#d94a4a; --radius:22px;
+    --rvc-orange:#D96A1B;
+    --rvc-orange-dark:#A94A13;
+    --rvc-forest:#31513A;
+    --rvc-forest-dark:#1D3527;
+    --rvc-charcoal:#181818;
+    --rvc-ink:#F5E9D2;
+    --rvc-muted:#D9C29C;
+    --rvc-card:#243B2B;
+    --rvc-card2:#18271E;
+    --rvc-gold:#D9B56B;
+    --rvc-green:#3F7A4B;
+    --rvc-bad:#B84F12;
+    --radius:22px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#090d16 0%,#12182a 45%,#0b1020 100%);color:var(--rvc-ink);}
+  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#111111 0%,#1D3527 48%,#0B0F0C 100%);color:var(--rvc-ink);}
   body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
   .app{width:min(100%,480px);margin:0 auto;padding:14px 12px 28px}
   .topbar{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:10px;margin-bottom:10px}
@@ -22,22 +32,22 @@
   .screen{display:none}.screen.active{display:block}
   .card{background:linear-gradient(180deg,var(--rvc-card),var(--rvc-card2));border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);box-shadow:0 14px 35px rgba(0,0,0,.35);padding:14px;margin:10px 0}
   label{display:block;font-size:13px;color:var(--rvc-muted);margin:12px 0 6px}
-  input,select{width:100%;font-size:18px;color:var(--rvc-ink);background:#0f1525;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:13px 14px;outline:none}
+  input,select{width:100%;font-size:18px;color:var(--rvc-ink);background:#111811;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:13px 14px;outline:none}
   input:focus,select:focus{border-color:var(--rvc-gold)}
   .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
   button{border:0;border-radius:18px;padding:15px 12px;font-weight:900;font-size:17px;color:white;background:#4b5563;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer}
   button:active{transform:translateY(1px)}
   button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
-  .primary{background:linear-gradient(135deg,var(--rvc-red),#8e1818)}
-  .secondary{background:linear-gradient(135deg,var(--rvc-blue),#1f237d)}
-  .gold{background:var(--rvc-gold);color:#1a1302}.green{background:var(--rvc-green)}.bad{background:var(--rvc-bad)}.muted{background:#4b5563}
+  .primary{background:linear-gradient(135deg,var(--rvc-orange),var(--rvc-orange-dark))}
+  .secondary{background:linear-gradient(135deg,var(--rvc-forest),var(--rvc-forest-dark))}
+  .gold{background:var(--rvc-gold);color:#1a1302}.green{background:var(--rvc-green)}.bad{background:var(--rvc-bad)}.muted{background:#4B4234}
   .scoreboard{display:grid;gap:10px}
   .player-card{overflow:hidden;padding:0}
   .player-head{display:grid;grid-template-columns:1fr 86px;align-items:center;min-height:78px}
   .player-name{font-size:25px;font-weight:950;padding:13px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .score{height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:1000;background:#edf2f7;color:#111827;border-radius:18px;margin:10px}
-  .p1 .player-head{background:linear-gradient(90deg,#8b1714,var(--rvc-red))}
-  .p2 .player-head{background:linear-gradient(90deg,#1f237d,var(--rvc-blue))}
+  .score{height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:1000;background:#F5E9D2;color:#1D3527;border-radius:18px;margin:10px}
+  .p1 .player-head{background:linear-gradient(90deg,var(--rvc-orange-dark),var(--rvc-orange))}
+  .p2 .player-head{background:linear-gradient(90deg,var(--rvc-forest-dark),var(--rvc-forest))}
   .mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.08)}
   .mini{padding:8px 4px;text-align:center;background:rgba(0,0,0,.16)}
   .mini b{display:block;font-size:17px}.mini span{font-size:10px;color:var(--rvc-muted)}
@@ -54,7 +64,8 @@
   .round-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:rgba(0,0,0,.18);border-radius:14px;padding:10px}
   .round-item small{color:var(--rvc-muted)}
   .round-item button{font-size:12px;padding:9px 10px;border-radius:12px}
-  .status{margin-top:10px;color:#dbe4ff;font-size:13px}
+  .status{margin-top:10px;color:#F5E9D2;font-size:13px}
+  .pending-highlight{margin-top:6px;color:var(--rvc-gold);font-weight:800}
   .inline-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
   @media (max-width:380px){.app{padding-left:9px;padding-right:9px}h1{font-size:20px}.player-name{font-size:22px}.score{font-size:42px}button{font-size:16px}}
 </style>
@@ -126,7 +137,8 @@
         <div class="round-title">CURRENT THROW</div>
         <div class="game-id" id="gameIdLabel">Game —</div>
         <div class="bags" id="currentBags">— — — —</div>
-        <div class="tiny" id="turnHelp">Tap each bag result. After four bags, Riley answers automatically.</div>
+        <div class="tiny" id="pendingThrow"></div>
+        <div class="tiny" id="turnHelp">Tap four bags. In human mode, Player 2 throws next, then the round scores.</div>
       </div>
 
       <div class="card player-card p2">
@@ -152,6 +164,7 @@
         <button class="primary" onclick="resetGame()">Reset</button>
       </div>
       <button id="submitBtn" class="green" style="width:100%;margin-top:10px" onclick="submitFinal()">Submit Final Game</button>
+      <button class="secondary" style="width:100%;margin-top:10px" onclick="openRemoteLink()">Open Pocket Remote</button>
       <div class="status" id="saveStatus">Auto-save ready.</div>
     </div>
 
@@ -413,6 +426,14 @@ function update(){
   document.getElementById('p2In').textContent=st.p2.in;
   document.getElementById('p1On').textContent=st.p1.on;
   document.getElementById('p2On').textContent=st.p2.on;
+  const pendingEl=document.getElementById('pendingThrow');
+  if(game.inputSide===2 && game.p1PendingIcons && game.p1PendingIcons.length){
+    pendingEl.className='tiny pending-highlight';
+    pendingEl.textContent = `${game.p1Name} threw: ${game.p1PendingIcons.join(' ')}`;
+  }else{
+    pendingEl.className='tiny';
+    pendingEl.textContent = '';
+  }
   document.getElementById('turnHelp').textContent = game.inputSide===1 ? `${game.p1Name} turn. Tap each bag result.` : `${game.p2Name} turn. Tap each bag result.`;
   document.getElementById('currentBags').textContent = game.currentIcons.length ? game.currentIcons.join(' ') : '— — — —';
   renderRounds();

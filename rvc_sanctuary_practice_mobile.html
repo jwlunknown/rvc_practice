@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#111827" />
+<title>RVC Sanctuary Practice</title>
+<style>
+  :root{
+    --rvc-red:#c62828;
+    --rvc-blue:#2f34b6;
+    --rvc-navy:#111827;
+    --rvc-ink:#f8fafc;
+    --rvc-muted:#a8b0c5;
+    --rvc-card:#192033;
+    --rvc-card2:#222b44;
+    --rvc-gold:#f3b72b;
+    --rvc-green:#22a35a;
+    --rvc-bad:#d94a4a;
+    --radius:22px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#090d16 0%,#12182a 45%,#0b1020 100%);color:var(--rvc-ink);}
+  body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+  .app{width:min(100%,480px);margin:0 auto;padding:14px 12px 28px}
+  .topbar{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:10px;margin-bottom:10px}
+  .logo-slot{height:54px;border:1px dashed rgba(255,255,255,.25);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--rvc-muted);font-size:10px;text-align:center;background:rgba(255,255,255,.04)}
+  h1{margin:0;text-align:center;font-size:23px;letter-spacing:.5px;line-height:1.05}
+  .tag{text-align:center;color:var(--rvc-muted);font-size:12px;margin-top:3px}
+  .screen{display:none}
+  .screen.active{display:block}
+  .card{background:linear-gradient(180deg,var(--rvc-card),var(--rvc-card2));border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);box-shadow:0 14px 35px rgba(0,0,0,.35);padding:14px;margin:10px 0}
+  label{display:block;font-size:13px;color:var(--rvc-muted);margin:12px 0 6px}
+  input,select{width:100%;font-size:18px;color:var(--rvc-ink);background:#0f1525;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:13px 14px;outline:none}
+  input:focus,select:focus{border-color:var(--rvc-gold)}
+  .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  button{border:0;border-radius:18px;padding:15px 12px;font-weight:900;font-size:17px;color:white;background:#4b5563;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer}
+  button:active{transform:translateY(1px)}
+  .primary{background:linear-gradient(135deg,var(--rvc-red),#8e1818)}
+  .secondary{background:linear-gradient(135deg,var(--rvc-blue),#1f237d)}
+  .gold{background:var(--rvc-gold);color:#1a1302}
+  .green{background:var(--rvc-green)}
+  .bad{background:var(--rvc-bad)}
+  .muted{background:#4b5563}
+  .scoreboard{display:grid;gap:10px}
+  .player-card{overflow:hidden;padding:0}
+  .player-head{display:grid;grid-template-columns:1fr 86px;align-items:center;min-height:78px}
+  .player-name{font-size:25px;font-weight:950;padding:13px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .score{height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:1000;background:#edf2f7;color:#111827;border-radius:18px;margin:10px}
+  .p1 .player-head{background:linear-gradient(90deg,#8b1714,var(--rvc-red))}
+  .p2 .player-head{background:linear-gradient(90deg,#1f237d,var(--rvc-blue))}
+  .mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.08)}
+  .mini{padding:8px 4px;text-align:center;background:rgba(0,0,0,.16)}
+  .mini b{display:block;font-size:17px}.mini span{font-size:10px;color:var(--rvc-muted)}
+  .round-panel{text-align:center}
+  .round-title{font-size:12px;color:var(--rvc-muted);font-weight:800;letter-spacing:.12em}
+  .bags{font-size:28px;letter-spacing:4px;margin:8px 0 2px;min-height:38px}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  .controls .wide{grid-column:1/-1}
+  .utility{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+  .utility button{font-size:13px;padding:12px 8px;border-radius:14px}
+  .log{max-height:230px;overflow:auto;line-height:1.45;color:#e5eaff;font-size:14px}
+  .tiny{color:var(--rvc-muted);font-size:12px;line-height:1.4}
+  .future{border:1px dashed rgba(243,183,43,.38);background:rgba(243,183,43,.07);border-radius:16px;padding:10px;margin-top:10px}
+  @media (max-width:380px){
+    .app{padding-left:9px;padding-right:9px}
+    h1{font-size:20px}
+    .player-name{font-size:22px}
+    .score{font-size:42px}
+    button{font-size:16px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <div class="logo-slot">RVC<br>LOGO</div>
+    <div>
+      <h1>Sanctuary Practice</h1>
+      <div class="tag">Rogue Valley Cornhole</div>
+    </div>
+    <div class="logo-slot">SPONSOR<br>LOGO</div>
+  </div>
+
+  <section id="setupScreen" class="screen active">
+    <div class="card">
+      <label>Your name</label>
+      <input id="playerName" placeholder="Jeremy" autocomplete="name" />
+
+      <label>Opponent</label>
+      <div class="choice">
+        <button class="secondary" onclick="chooseRiley()">Play Riley 👻</button>
+        <button class="muted" onclick="chooseHuman()">Enter Name</button>
+      </div>
+
+      <div id="humanOpponentBox" style="display:none">
+        <label>Second player name</label>
+        <input id="opponentName" placeholder="Kate, Mitch, etc." />
+      </div>
+
+      <label>Ghost Riley level</label>
+      <select id="ghostLevel">
+        <option value="4.5">Beginner Riley - 4.5 PPR</option>
+        <option value="6" selected>Pub Night Riley - 6.0 PPR</option>
+        <option value="7.5">Regional Riley - 7.5 PPR</option>
+        <option value="8.5">Demon Riley - 8.5 PPR</option>
+        <option value="10">World Beater Riley - 10.0 PPR</option>
+      </select>
+
+      <label>Game mode</label>
+      <select id="mode">
+        <option value="singles" selected>Singles - 1v1</option>
+        <option value="teams" disabled>Teams - 2v2 coming soon</option>
+        <option value="hybrid" disabled>2v1 + Riley coming soon</option>
+      </select>
+
+      <button class="primary" style="width:100%;margin-top:16px" onclick="startGame()">Start Practice</button>
+
+      <div class="future tiny">
+        Future-ready: teams, saved player profiles, email-linked stats, leaderboards, and database sync can plug in later without rebuilding the whole thing.
+      </div>
+    </div>
+  </section>
+
+  <section id="gameScreen" class="screen">
+    <div class="scoreboard">
+      <div class="card player-card p1">
+        <div class="player-head">
+          <div class="player-name" id="p1Name">Player</div>
+          <div class="score" id="p1Score">0</div>
+        </div>
+        <div class="mini-stats">
+          <div class="mini"><b id="p1Ppr">0.00</b><span>PPR</span></div>
+          <div class="mini"><b id="p1Rounds">0</b><span>RDS</span></div>
+          <div class="mini"><b id="p1In">0</b><span>IN</span></div>
+          <div class="mini"><b id="p1On">0</b><span>ON</span></div>
+        </div>
+      </div>
+
+      <div class="card round-panel">
+        <div class="round-title">CURRENT THROW</div>
+        <div class="bags" id="currentBags">— — — —</div>
+        <div class="tiny">Tap each bag result. After four bags, Riley answers automatically. For human games, enter Player 2’s four bags next.</div>
+      </div>
+
+      <div class="card player-card p2">
+        <div class="player-head">
+          <div class="player-name" id="p2Name">Riley 👻</div>
+          <div class="score" id="p2Score">0</div>
+        </div>
+        <div class="mini-stats">
+          <div class="mini"><b id="p2Ppr">0.00</b><span>PPR</span></div>
+          <div class="mini"><b id="p2Rounds">0</b><span>RDS</span></div>
+          <div class="mini"><b id="p2In">0</b><span>IN</span></div>
+          <div class="mini"><b id="p2On">0</b><span>ON</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="controls">
+        <button class="green" onclick="addBag(3,'🕳️')">IN<br>+3</button>
+        <button class="gold" onclick="addBag(1,'🟨')">ON<br>+1</button>
+        <button class="bad wide" onclick="addBag(0,'❌')">OFF +0</button>
+      </div>
+      <div class="utility">
+        <button class="muted" onclick="undoBag()">Undo</button>
+        <button class="secondary" onclick="showSetup()">Players</button>
+        <button class="primary" onclick="resetGame()">Reset</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <strong>Round Log</strong>
+      <div class="log" id="log">Fresh boards. Quiet room. Let it fly.</div>
+    </div>
+  </section>
+</div>
+
+<script>
+const STORAGE_KEY = 'rvcSanctuaryPractice.v2';
+let opponentType = 'riley';
+let inputSide = 1;
+let p1Score=0, p2Score=0, current=[], currentIcons=[], p1Round=[], p2Round=[];
+let p1={rounds:0,bags:0,pts:0,in:0,on:0};
+let p2={rounds:0,bags:0,pts:0,in:0,on:0};
+
+function loadPrefs(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    if(saved.playerName) document.getElementById('playerName').value=saved.playerName;
+    if(saved.opponentName) document.getElementById('opponentName').value=saved.opponentName;
+    if(saved.opponentType==='human') chooseHuman(); else chooseRiley();
+    if(saved.ghostLevel) document.getElementById('ghostLevel').value=saved.ghostLevel;
+  }catch(e){}
+}
+function savePrefs(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({
+    playerName: document.getElementById('playerName').value.trim(),
+    opponentName: document.getElementById('opponentName').value.trim(),
+    opponentType,
+    ghostLevel: document.getElementById('ghostLevel').value
+  }));
+}
+function chooseRiley(){ opponentType='riley'; document.getElementById('humanOpponentBox').style.display='none'; }
+function chooseHuman(){ opponentType='human'; document.getElementById('humanOpponentBox').style.display='block'; }
+function startGame(){
+  savePrefs();
+  const p1n=document.getElementById('playerName').value.trim() || 'Player 1';
+  const p2n=opponentType==='riley' ? 'Riley 👻' : (document.getElementById('opponentName').value.trim() || 'Player 2');
+  document.getElementById('p1Name').textContent=p1n;
+  document.getElementById('p2Name').textContent=p2n;
+  document.getElementById('setupScreen').classList.remove('active');
+  document.getElementById('gameScreen').classList.add('active');
+  update();
+}
+function showSetup(){
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('setupScreen').classList.add('active');
+}
+function addBag(points, icon){
+  if(current.length>=4) return;
+  current.push(points); currentIcons.push(icon);
+  addStats(inputSide, points);
+  update();
+  if(current.length===4) finishThrow();
+}
+function addStats(side, points){
+  const s=side===1?p1:p2;
+  s.bags++; s.pts+=points;
+  if(points===3) s.in++;
+  if(points===1) s.on++;
+}
+function removeStats(side, points){
+  const s=side===1?p1:p2;
+  s.bags--; s.pts-=points;
+  if(points===3) s.in--;
+  if(points===1) s.on--;
+}
+function undoBag(){
+  if(current.length===0) return;
+  const p=current.pop(); currentIcons.pop();
+  removeStats(inputSide,p);
+  update();
+}
+function finishThrow(){
+  if(inputSide===1){
+    p1Round=[...current];
+    if(opponentType==='riley'){
+      const g=ghostThrow();
+      p2Round=g.arr;
+      document.getElementById('currentBags').textContent='Riley: '+g.icons.join(' ');
+      scoreRound(g.icons);
+      current=[]; currentIcons=[]; inputSide=1;
+    }else{
+      current=[]; currentIcons=[];
+      inputSide=2;
+      document.getElementById('currentBags').textContent='P2 turn: — — — —';
+    }
+  }else{
+    p2Round=[...current];
+    scoreRound([...currentIcons]);
+    current=[]; currentIcons=[]; inputSide=1;
+  }
+  update();
+}
+function ghostThrow(){
+  const target=parseFloat(document.getElementById('ghostLevel').value);
+  let pIn=Math.max(0.05, Math.min(0.78, target/12 - 0.08));
+  let pOn=Math.max(0.12, Math.min(0.55, (target - pIn*12)/4));
+  let arr=[], icons=[];
+  for(let i=0;i<4;i++){
+    let r=Math.random(), p=0, ic='❌';
+    if(r<pIn){p=3; ic='🕳️';}
+    else if(r<pIn+pOn){p=1; ic='🟨';}
+    arr.push(p); icons.push(ic); addStats(2,p);
+  }
+  return {arr,icons};
+}
+function scoreRound(p2Icons){
+  const r1=p1Round.reduce((a,b)=>a+b,0), r2=p2Round.reduce((a,b)=>a+b,0);
+  const diff=r1-r2;
+  if(diff>0) p1Score+=diff;
+  if(diff<0) p2Score+=Math.abs(diff);
+  p1.rounds++; p2.rounds++;
+  const p1n=document.getElementById('p1Name').textContent;
+  const p2n=document.getElementById('p2Name').textContent;
+  let msg=`<b>Round ${p1.rounds}</b>: ${p1n} ${r1} vs ${p2n} ${r2}. `;
+  msg += diff>0 ? `${p1n} scores ${diff}.` : diff<0 ? `${p2n} scores ${Math.abs(diff)}.` : `Wash.`;
+  if(p1Score>=21 || p2Score>=21) msg += p1Score>=21 ? `<br>🏆 ${p1n} wins.` : `<br>👻 ${p2n} wins.`;
+  document.getElementById('log').innerHTML=msg+`<br><span class="tiny">Match: ${p1Score} - ${p2Score}</span><hr>`+document.getElementById('log').innerHTML;
+  p1Round=[]; p2Round=[];
+}
+function ppr(s){ return s.rounds ? (s.pts/s.rounds).toFixed(2) : (s.bags ? (s.pts/(s.bags/4)).toFixed(2) : '0.00'); }
+function update(){
+  document.getElementById('p1Score').textContent=p1Score;
+  document.getElementById('p2Score').textContent=p2Score;
+  document.getElementById('p1Ppr').textContent=ppr(p1);
+  document.getElementById('p2Ppr').textContent=ppr(p2);
+  document.getElementById('p1Rounds').textContent=p1.rounds;
+  document.getElementById('p2Rounds').textContent=p2.rounds;
+  document.getElementById('p1In').textContent=p1.in;
+  document.getElementById('p2In').textContent=p2.in;
+  document.getElementById('p1On').textContent=p1.on;
+  document.getElementById('p2On').textContent=p2.on;
+  if(current.length || inputSide===1){
+    const who=inputSide===1?'P1':'P2';
+    document.getElementById('currentBags').textContent=(currentIcons.length ? currentIcons.join(' ') : '— — — —');
+  }
+}
+function resetGame(){
+  p1Score=0; p2Score=0; current=[]; currentIcons=[]; p1Round=[]; p2Round=[]; inputSide=1;
+  p1={rounds:0,bags:0,pts:0,in:0,on:0};
+  p2={rounds:0,bags:0,pts:0,in:0,on:0};
+  document.getElementById('log').textContent='Fresh boards. Quiet room. Let it fly.';
+  update();
+}
+loadPrefs();
+</script>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="theme-color" content="#111827" />
-<title>RVC Sanctuary Practice</title>
+<title>TOSSED | Rogue Valley Cornhole</title>
 <style>
   :root{
     --rvc-orange:#D96A1B;
@@ -26,8 +26,8 @@
   body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
   .app{width:min(100%,480px);margin:0 auto;padding:14px 12px 28px}
   .topbar{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:10px;margin-bottom:10px}
-  .logo-slot{height:54px;border:1px dashed rgba(255,255,255,.25);border-radius:16px;display:flex;align-items:center;justify-content:center;color:var(--rvc-muted);font-size:10px;text-align:center;background:rgba(255,255,255,.04)}
-  h1{margin:0;text-align:center;font-size:23px;letter-spacing:.5px;line-height:1.05}
+  .logo-slot{height:54px;width:54px}
+  h1{margin:0;text-align:center;font-size:34px;letter-spacing:.08em;line-height:1.05;font-weight:1000}
   .tag{text-align:center;color:var(--rvc-muted);font-size:12px;margin-top:3px}
   .screen{display:none}.screen.active{display:block}
   .card{background:linear-gradient(180deg,var(--rvc-card),var(--rvc-card2));border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);box-shadow:0 14px 35px rgba(0,0,0,.35);padding:14px;margin:10px 0}
@@ -73,9 +73,9 @@
 <body>
 <div class="app">
   <div class="topbar">
-    <div class="logo-slot">RVC<br>LOGO</div>
-    <div><h1>Sanctuary Practice</h1><div class="tag">Rogue Valley Cornhole</div></div>
-    <div class="logo-slot">SPONSOR<br>LOGO</div>
+    <div class="logo-slot"></div>
+    <div><h1>TOSSED</h1><div class="tag">Rogue Valley Cornhole</div></div>
+    <div class="logo-slot"></div>
   </div>
 
   <section id="setupScreen" class="screen active">
@@ -210,11 +210,11 @@ function defaultGame(){
 function makeGameId(){
   const d=new Date();
   const pad=n=>String(n).padStart(2,'0');
-  return `RVC-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+  return `TOSSED-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
 }
 function makePlayerId(name){
   const clean = (name || 'PLAYER').toUpperCase().replace(/[^A-Z0-9]+/g,'').slice(0,8) || 'PLAYER';
-  return `RVC-P-${clean}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+  return `TOSSED-P-${clean}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
 }
 function getPlayers(){
   let players=[];

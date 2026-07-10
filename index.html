@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#0b1711">
 <title>Tossed Toss Tracker</title>
 <style>
@@ -109,10 +112,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
   font-size:34px;font-weight:950;letter-spacing:8px;text-align:center;
   background:#10251b;border-radius:18px;padding:15px;margin:12px 0
 }
-.companion-banner{
-  border:1px solid #e3bb6577;background:#3d321d;border-radius:18px;padding:13px;
-  text-align:center;margin:12px 0;color:#ffe9b0
-}
 .divider{height:1px;background:#ffffff18;margin:16px 0}
 @media(max-width:480px){
   .mode-grid,.row,.meta{grid-template-columns:1fr}
@@ -201,10 +200,6 @@ button:disabled{opacity:.45;cursor:not-allowed}
   </section>
 
   <section id="tracker" class="hidden">
-    <div id="companionBanner" class="companion-banner hidden">
-      COMPANION DEVICE · linked to <strong id="companionPlayerName">Player</strong>
-    </div>
-
     <div class="card">
       <div class="player-head">
         <div>
@@ -212,7 +207,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
           <div id="playerIdText" class="pid"></div>
           <div id="activeRoomBadge" class="room-badge hidden" style="margin-top:8px">
             <span id="activeRoomDot" class="dot"></span>
-            ROOM <span id="activeRoomCode">----</span>
+            <span id="activeRoleLabel">ROOM</span> <span id="activeRoomCode">----</span>
           </div>
         </div>
         <button class="secondary" onclick="showHome()">Home</button>
@@ -675,8 +670,7 @@ async function openTracker(){
   activeRoomCode.textContent=room||"----";
 
   const companion=activeRole==="companion";
-  companionBanner.classList.toggle("hidden",!companion);
-  companionPlayerName.textContent=player.display_name;
+  activeRoleLabel.textContent=companion?"COMPANION · ROOM":"ROOM";
 
   linkDeviceCard.classList.toggle("hidden",!(inRoom&&activeRole==="player"));
   const seat=ownSeat();

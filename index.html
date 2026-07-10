@@ -44,6 +44,14 @@ button:active{transform:translateY(1px)}button:disabled{opacity:.42}
 
  <section id="setupScreen" class="screen active">
   <div class="card">
+   <strong>LIVE ROOM</strong>
+   <div class="tiny">Create or join a private 4-digit room. Every connected device will share the same match state.</div>
+   <label>4-digit room code</label>
+   <div class="setup-row"><input id="roomCode" inputmode="numeric" maxlength="4" placeholder="2146"><button class="secondary" onclick="joinRoom()">Join Room</button></div>
+   <button class="gold" style="width:100%;margin-top:10px" onclick="createRoom()">Create Room</button>
+   <div class="status" id="roomStatus">Offline mode — local device only.</div>
+  </div>
+  <div class="card">
    <label>Player 1</label><select id="p1Select"></select>
    <label>Opponent</label>
    <div class="choice" style="grid-template-columns:repeat(3,1fr)"><button class="gold" onclick="setOpponent('solo')">Solo</button><button class="secondary" onclick="setOpponent('riley')">Vs Riley 👻</button><button class="muted" onclick="setOpponent('human')">Multiplayer</button></div>
@@ -91,7 +99,12 @@ button:active{transform:translateY(1px)}button:disabled{opacity:.42}
   <div class="card"><strong>Rounds</strong><div class="tiny">Completed rounds update both player dashboards automatically.</div><div class="round-list" id="roundList"></div></div>
  </section>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const SUPABASE_URL="https://gymkbeqmvuhlivobnyvd.supabase.co";
+const SUPABASE_KEY="sb_publishable_XCutLWC_6v7mXOUa3qaHgw_U3y5fW-U";
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let liveRoomCode=null, liveChannel=null, applyingRemote=false;
 const KEY='tossed.dashboard.v1', PLAYERS_KEY='rvcSanctuaryPractice.players.v1';
 let opponentType='riley';
 const THEMES=['theme-rvc','theme-beach','theme-bridge'];
@@ -111,7 +124,7 @@ function startGame(fresh){clampRounds();if(fresh||!localStorage.getItem(KEY)){ga
  game.mode=gameMode.value;game.roundTarget=Number(roundTarget.value);game.opponentType=opponentType;game.ghostLevel=ghostLevel.value;game.p1Name=selectedName('p1Select');game.p2Name=opponentType==='riley'?'Riley 👻':opponentType==='solo'?'Solo Session':selectedName('p2Select');game.finished=false;if(fresh)rotateTheme();else applyTheme();showGame();save()}
 function showGame(){setupScreen.classList.remove('active');gameScreen.classList.add('active');applyTheme();update()}
 function showSetup(){gameScreen.classList.remove('active');setupScreen.classList.add('active')}
-function save(){localStorage.setItem(KEY,JSON.stringify(game));saveStatus.textContent='Saved locally at '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}
+function save(){localStorage.setItem(KEY,JSON.stringify(game));saveStatus.textContent='Saved locally at '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'});pushLiveState()}
 function addBag(side,points){if(game.finished)return;if(side!==game.inputSide)return;if(game.current.length>=4)return;game.current.push(points);if(game.current.length===4)finishThrow();save();update()}
 function undoBag(){if(game.current.length){game.current.pop();save();update()}}
 function finishThrow(){if(game.inputSide===1){if(game.opponentType==='solo'){addRound([...game.current],[]);game.current=[];game.inputSide=1}else if(game.opponentType==='riley'){const r=ghostThrow();addRound([...game.current],r);game.current=[];game.inputSide=1}else{game.p1Pending=[...game.current];game.current=[];game.inputSide=2}}else{addRound([...game.p1Pending],[...game.current]);game.p1Pending=[];game.current=[];game.inputSide=1}if((game.mode==='skins'||game.mode==='rounders')&&game.rounds.length>=game.roundTarget)game.finished=true}
@@ -133,6 +146,40 @@ function update(){const s=stats();p1Name.textContent=game.p1Name;p2Name.textCont
  p2Dashboard.style.display=game.opponentType==='solo'?'none':'block';p1Controls.classList.toggle('inactive',game.inputSide!==1||game.finished);p2Controls.classList.toggle('inactive',game.inputSide!==2||game.opponentType==='riley'||game.opponentType==='solo'||game.finished);
  roundList.innerHTML=game.rounds.length?game.rounds.map((r,i)=>`<div class="round-item"><div><b>Round ${i+1}</b><br><small>${game.opponentType==='solo'?`${game.p1Name} ${r.p1Pts}`:`${game.p1Name} ${r.p1Pts} · ${game.p2Name} ${r.p2Pts}`}</small></div><small>${icons(r.p1Bags)}${game.opponentType==='solo'?'':`<br>${icons(r.p2Bags)}`}</small></div>`).join(''):'<div class="tiny">No completed rounds yet.</div>'}
 function resetGame(){if(!confirm('Reset this match?'))return;const keep={...game};game=defaultGame();game.mode=keep.mode;game.roundTarget=keep.roundTarget;game.opponentType=keep.opponentType;game.ghostLevel=keep.ghostLevel;game.p1Name=keep.p1Name;game.p2Name=keep.p2Name;game.themeIndex=((keep.themeIndex||0)+1)%THEMES.length;applyTheme();save();update()}
+
+function cleanRoomCode(){return String(roomCode.value||'').replace(/\D/g,'').slice(0,4)}
+async function createRoom(){
+ const code=cleanRoomCode(); if(code.length!==4){roomStatus.textContent='Enter exactly 4 digits.';return}
+ const {data:existing}=await sb.from('live_rooms').select('room_code').eq('room_code',code).maybeSingle();
+ if(existing){roomStatus.textContent='That room already exists. Use Join Room.';return}
+ const {error}=await sb.from('live_rooms').insert({room_code:code,game_state:game});
+ if(error){roomStatus.textContent='Could not create room: '+error.message;return}
+ await connectRoom(code); roomStatus.textContent='LIVE · Room '+code+' created';
+}
+async function joinRoom(){
+ const code=cleanRoomCode(); if(code.length!==4){roomStatus.textContent='Enter exactly 4 digits.';return}
+ const {data,error}=await sb.from('live_rooms').select('*').eq('room_code',code).maybeSingle();
+ if(error||!data){roomStatus.textContent='Room '+code+' not found.';return}
+ if(data.game_state&&Object.keys(data.game_state).length){game=data.game_state;localStorage.setItem(KEY,JSON.stringify(game))}
+ await connectRoom(code); roomStatus.textContent='LIVE · Joined room '+code; applyTheme(); update();
+}
+async function connectRoom(code){
+ liveRoomCode=code;
+ if(liveChannel) await sb.removeChannel(liveChannel);
+ liveChannel=sb.channel('tossed-room-'+code)
+  .on('postgres_changes',{event:'UPDATE',schema:'public',table:'live_rooms',filter:'room_code=eq.'+code},payload=>{
+    if(payload.new&&payload.new.game_state){
+      applyingRemote=true; game=payload.new.game_state; localStorage.setItem(KEY,JSON.stringify(game)); applyTheme(); update(); applyingRemote=false;
+      roomStatus.textContent='LIVE · Room '+code+' · synced '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit',second:'2-digit'});
+    }
+  }).subscribe();
+}
+async function pushLiveState(){
+ if(!liveRoomCode||applyingRemote)return;
+ const {error}=await sb.from('live_rooms').update({game_state:game,updated_at:new Date().toISOString()}).eq('room_code',liveRoomCode);
+ if(error) roomStatus.textContent='Live sync error: '+error.message;
+}
+
 fillPlayers();setOpponent('riley');toggleRoundOptions();
 try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&saved.gameId)game=saved}catch(e){}applyTheme();
 </script>

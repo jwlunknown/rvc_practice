@@ -1,583 +1,140 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#111827" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111111">
 <title>TOSSED | Rogue Valley Cornhole</title>
 <style>
-  :root{
-    --rvc-orange:#D96A1B;
-    --rvc-orange-dark:#A94A13;
-    --rvc-forest:#31513A;
-    --rvc-forest-dark:#1D3527;
-    --rvc-charcoal:#181818;
-    --rvc-ink:#F5E9D2;
-    --rvc-muted:#D9C29C;
-    --rvc-card:#243B2B;
-    --rvc-card2:#18271E;
-    --rvc-gold:#D9B56B;
-    --rvc-green:#3F7A4B;
-    --rvc-bad:#B84F12;
-    --radius:22px;
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#111111 0%,#1D3527 48%,#0B0F0C 100%);color:var(--rvc-ink);}
-  body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
-  .app{width:min(100%,480px);margin:0 auto;padding:14px 12px 28px}
-  .topbar{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:10px;margin-bottom:10px}
-  .logo-slot{height:54px;width:54px}
-  h1{margin:0;text-align:center;font-size:34px;letter-spacing:.08em;line-height:1.05;font-weight:1000}
-  .tag{text-align:center;color:var(--rvc-muted);font-size:12px;margin-top:3px}
-  .screen{display:none}.screen.active{display:block}
-  .card{background:linear-gradient(180deg,var(--rvc-card),var(--rvc-card2));border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);box-shadow:0 14px 35px rgba(0,0,0,.35);padding:14px;margin:10px 0}
-  label{display:block;font-size:13px;color:var(--rvc-muted);margin:12px 0 6px}
-  input,select{width:100%;font-size:18px;color:var(--rvc-ink);background:#111811;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:13px 14px;outline:none}
-  input:focus,select:focus{border-color:var(--rvc-gold)}
-  .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-  button{border:0;border-radius:18px;padding:15px 12px;font-weight:900;font-size:17px;color:white;background:#4b5563;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer}
-  button:active{transform:translateY(1px)}
-  button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
-  .primary{background:linear-gradient(135deg,var(--rvc-orange),var(--rvc-orange-dark))}
-  .secondary{background:linear-gradient(135deg,var(--rvc-forest),var(--rvc-forest-dark))}
-  .gold{background:var(--rvc-gold);color:#1a1302}.green{background:var(--rvc-green)}.bad{background:var(--rvc-bad)}.muted{background:#4B4234}
-  .scoreboard{display:grid;gap:10px}
-  .player-card{overflow:hidden;padding:0}
-  .player-head{display:grid;grid-template-columns:1fr 86px;align-items:center;min-height:78px}
-  .player-name{font-size:25px;font-weight:950;padding:13px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .score{height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:1000;background:#F5E9D2;color:#1D3527;border-radius:18px;margin:10px}
-  .p1 .player-head{background:linear-gradient(90deg,var(--rvc-orange-dark),var(--rvc-orange))}
-  .p2 .player-head{background:linear-gradient(90deg,var(--rvc-forest-dark),var(--rvc-forest))}
-  .mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.08)}
-  .mini{padding:8px 4px;text-align:center;background:rgba(0,0,0,.16)}
-  .mini b{display:block;font-size:17px}.mini span{font-size:10px;color:var(--rvc-muted)}
-  .round-panel{text-align:center}
-  .round-title{font-size:12px;color:var(--rvc-muted);font-weight:800;letter-spacing:.12em}
-  .game-id{font-size:11px;color:var(--rvc-muted);margin-top:2px;word-break:break-word}
-  .bags{font-size:28px;letter-spacing:4px;margin:8px 0 2px;min-height:38px}
-  .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.controls .wide{grid-column:1/-1}
-  .utility{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
-  .utility button{font-size:13px;padding:12px 8px;border-radius:14px}
-  .tiny{color:var(--rvc-muted);font-size:12px;line-height:1.4}
-  .future{border:1px dashed rgba(243,183,43,.38);background:rgba(243,183,43,.07);border-radius:16px;padding:10px;margin-top:10px}
-  .round-list{display:grid;gap:8px;margin-top:10px}
-  .round-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:rgba(0,0,0,.18);border-radius:14px;padding:10px}
-  .round-item small{color:var(--rvc-muted)}
-  .round-item button{font-size:12px;padding:9px 10px;border-radius:12px}
-  .status{margin-top:10px;color:#F5E9D2;font-size:13px}
-  .pending-highlight{margin-top:6px;color:var(--rvc-gold);font-weight:800}
-  .inline-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-  @media (max-width:380px){.app{padding-left:9px;padding-right:9px}h1{font-size:20px}.player-name{font-size:22px}.score{font-size:42px}button{font-size:16px}}
+:root{--orange:#D96A1B;--orange2:#A94A13;--forest:#31513A;--forest2:#1D3527;--ink:#F5E9D2;--muted:#D9C29C;--card:#243B2B;--card2:#18271E;--gold:#D9B56B;--green:#3F7A4B;--bad:#B84F12;--accentA:#A94A13;--accentB:#D96A1B;--accentC:#31513A;--accentD:#1D3527;--pageTop:#111111;--pageMid:#1D3527;--pageBottom:#0B0F0C;--radius:22px}
+body.theme-beach{--ink:#F8FCFF;--muted:#D5EAF3;--card:#24566C;--card2:#153847;--gold:#F2C06B;--green:#3B8C91;--bad:#D76B2C;--accentA:#1F6F8B;--accentB:#68B7D4;--accentC:#F28C28;--accentD:#B85A14;--pageTop:#123746;--pageMid:#2A718A;--pageBottom:#EAF7FB}
+body.theme-bridge{--ink:#FFF7EA;--muted:#E8D7BF;--card:#314A59;--card2:#1D2F39;--gold:#E8B56A;--green:#3C7A73;--bad:#C85A20;--accentA:#E66A1F;--accentB:#F59A3A;--accentC:#2F6F8E;--accentD:#183F52;--pageTop:#172A35;--pageMid:#2E6075;--pageBottom:#E5762D}
+body.theme-rvc{--accentA:#A94A13;--accentB:#D96A1B;--accentC:#31513A;--accentD:#1D3527;--pageTop:#111111;--pageMid:#1D3527;--pageBottom:#0B0F0C}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,var(--pageTop) 0%,var(--pageMid) 48%,var(--pageBottom) 100%);color:var(--ink)}
+body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.app{width:min(100%,520px);margin:auto;padding:14px 12px 28px}
+.topbar{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;margin-bottom:10px}.logo-slot{height:54px}
+h1{margin:0;text-align:center;font-size:34px;letter-spacing:.08em;line-height:1.05;font-weight:1000}.tag{text-align:center;color:var(--muted);font-size:12px;margin-top:3px}
+.screen{display:none}.screen.active{display:block}
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid #ffffff17;border-radius:var(--radius);box-shadow:0 14px 35px #0006;padding:14px;margin:10px 0}
+label{display:block;font-size:13px;color:var(--muted);margin:12px 0 6px}
+input,select{width:100%;font-size:18px;color:var(--ink);background:#111811;border:1px solid #ffffff2e;border-radius:14px;padding:13px 14px}
+button{border:0;border-radius:16px;padding:14px 10px;font-weight:900;font-size:16px;color:#fff;background:#4b5563;box-shadow:0 8px 18px #0004;cursor:pointer}
+button:active{transform:translateY(1px)}button:disabled{opacity:.42}
+.primary{background:linear-gradient(135deg,var(--orange),var(--orange2))}.secondary{background:linear-gradient(135deg,var(--forest),var(--forest2))}.gold{background:var(--gold);color:#1a1302}.green{background:var(--green)}.bad{background:var(--bad)}.muted{background:#4B4234}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.tiny{color:var(--muted);font-size:12px;line-height:1.4}.future{border:1px dashed #f3b72b61;background:#f3b72b12;border-radius:16px;padding:10px;margin-top:10px}
+.player-dashboard{overflow:hidden;padding:0}
+.player-head{display:grid;grid-template-columns:1fr 86px;align-items:center;min-height:76px}.player-name{font-size:25px;font-weight:950;padding:13px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.score{height:calc(100% - 16px);display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:1000;background:var(--ink);color:var(--forest2);border-radius:18px;margin:8px}
+.p1 .player-head{background:linear-gradient(90deg,var(--accentA),var(--accentB))}.p2 .player-head{background:linear-gradient(90deg,var(--accentD),var(--accentC))}
+.mini-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#ffffff14}.mini{padding:8px 2px;text-align:center;background:#00000029}.mini b{display:block;font-size:16px}.mini span{font-size:9px;color:var(--muted)}
+.player-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;padding:10px;background:#0c1710}.player-controls button{min-height:62px;font-size:16px;line-height:1.1}
+.player-controls.inactive{opacity:.38;pointer-events:none}
+.round-panel{text-align:center}.round-title{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.12em}.game-id{font-size:10px;color:var(--muted);margin-top:2px;word-break:break-word}.bags{font-size:27px;letter-spacing:4px;margin:8px 0 2px;min-height:38px}
+.match-strip{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;text-align:center}.match-strip b{font-size:13px}.match-strip .round-count{font-size:12px;color:var(--muted)}
+.utility{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.utility button{font-size:13px;padding:12px 8px}
+.round-list{display:grid;gap:8px;margin-top:10px}.round-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:#0003;border-radius:14px;padding:10px}.round-item small{color:var(--muted)}.round-item button{font-size:12px;padding:9px}
+.status{margin-top:10px;font-size:13px}.setup-row{display:grid;grid-template-columns:1fr 120px;gap:10px}
+@media(max-width:380px){h1{font-size:28px}.player-name{font-size:22px}.score{font-size:40px}.mini b{font-size:14px}.player-controls button{font-size:14px;padding:10px 4px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="topbar">
-    <div class="logo-slot"></div>
-    <div><h1>TOSSED</h1><div class="tag">Rogue Valley Cornhole</div></div>
-    <div class="logo-slot"></div>
+ <div class="topbar"><div class="logo-slot"></div><div><h1>TOSSED</h1><div class="tag">Rogue Valley Cornhole</div></div><div class="logo-slot"></div></div>
+
+ <section id="setupScreen" class="screen active">
+  <div class="card">
+   <label>Player 1</label><select id="p1Select"></select>
+   <label>Opponent</label>
+   <div class="choice" style="grid-template-columns:repeat(3,1fr)"><button class="gold" onclick="setOpponent('solo')">Solo</button><button class="secondary" onclick="setOpponent('riley')">Vs Riley 👻</button><button class="muted" onclick="setOpponent('human')">Multiplayer</button></div>
+   <div id="p2Box" style="display:none"><label>Player 2</label><select id="p2Select"></select></div>
+   <label>Game mode</label>
+   <select id="gameMode" onchange="toggleRoundOptions()"><option value="practice">Practice Match</option><option value="rounders">Rounders / Total Score</option><option value="skins">Skins</option></select>
+   <div id="roundOptions" style="display:none">
+    <label>Number of rounds</label>
+    <div class="setup-row"><input id="roundTarget" type="number" min="3" max="99" value="10"><button class="gold" onclick="clampRounds()">Set Rounds</button></div>
+    <div class="tiny" style="margin-top:6px">Choose any match length from 3 to 99 rounds. Rounders totals every bag point; Skins awards one skin for each winning round.</div>
+   </div>
+   <div id="rileyOptions"><label>Riley level</label><select id="ghostLevel"><option value="4.5">Beginner Riley — 4.5 PPR</option><option value="6" selected>Pub Night Riley — 6.0 PPR</option><option value="7.5">Regional Riley — 7.5 PPR</option><option value="8.5">Demon Riley — 8.5 PPR</option><option value="10">World Beater Riley — 10.0 PPR</option></select></div>
+   <button class="primary" style="width:100%;margin-top:16px" onclick="startGame(false)">Start / Resume</button>
+   <button class="muted" style="width:100%;margin-top:10px" onclick="startGame(true)">Start Brand New Match</button>
+   <div class="future tiny">Player dashboards are intentionally independent. Later, each slot can live on this device or link to another player's phone while sharing one live match session.</div>
+  </div>
+ </section>
+
+ <section id="gameScreen" class="screen">
+  <div class="card match-strip"><b id="modeLabel">PRACTICE</b><div class="round-count" id="roundProgress">Round 1</div><b id="turnLabel">Jeremy's turn</b></div>
+
+  <div class="card player-dashboard p1">
+   <div class="player-head"><div class="player-name" id="p1Name">Player 1</div><div class="score" id="p1Score">0</div></div>
+   <div class="mini-stats">
+    <div class="mini"><b id="p1Ppr">0.00</b><span>PPR</span></div><div class="mini"><b id="p1Rounds">0</b><span>RDS</span></div><div class="mini"><b id="p1In">0</b><span>IN</span></div><div class="mini"><b id="p1On">0</b><span>ON</span></div><div class="mini"><b id="p1OffPct">0%</b><span>OFF</span></div>
+   </div>
+   <div class="player-controls" id="p1Controls"><button class="green" onclick="addBag(1,3)">IN<br>+3</button><button class="gold" onclick="addBag(1,1)">ON<br>+1</button><button class="bad" onclick="addBag(1,0)">OFF<br>+0</button></div>
   </div>
 
-  <section id="setupScreen" class="screen active">
-    <div class="card">
-      <label>Player 1</label>
-      <select id="p1Select" onchange="handlePlayerSelect(1)"></select>
-      <input id="p1NewName" placeholder="New player name" style="display:none;margin-top:8px" />
-      <button class="muted" id="p1SaveBtn" style="display:none;width:100%;margin-top:8px" onclick="saveNewPlayer(1)">Save New Player</button>
+  <div class="card round-panel"><div class="round-title">CURRENT THROW</div><div class="game-id" id="gameIdLabel"></div><div class="bags" id="currentBags">— — — —</div><div id="currentThrowTotal" style="font-size:22px;font-weight:950;margin:2px 0 6px">0 PTS</div><div class="tiny" id="pendingThrow"></div></div>
 
-      <label>Opponent</label>
-      <div class="choice">
-        <button class="secondary" onclick="chooseRiley()">Play Riley 👻</button>
-        <button class="muted" onclick="chooseHuman()">Human Player</button>
-      </div>
+  <div class="card player-dashboard p2" id="p2Dashboard">
+   <div class="player-head"><div class="player-name" id="p2Name">Riley 👻</div><div class="score" id="p2Score">0</div></div>
+   <div class="mini-stats">
+    <div class="mini"><b id="p2Ppr">0.00</b><span>PPR</span></div><div class="mini"><b id="p2Rounds">0</b><span>RDS</span></div><div class="mini"><b id="p2In">0</b><span>IN</span></div><div class="mini"><b id="p2On">0</b><span>ON</span></div><div class="mini"><b id="p2OffPct">0%</b><span>OFF</span></div>
+   </div>
+   <div class="player-controls" id="p2Controls"><button class="green" onclick="addBag(2,3)">IN<br>+3</button><button class="gold" onclick="addBag(2,1)">ON<br>+1</button><button class="bad" onclick="addBag(2,0)">OFF<br>+0</button></div>
+  </div>
 
-      <div id="humanOpponentBox" style="display:none">
-        <label>Player 2</label>
-        <select id="p2Select" onchange="handlePlayerSelect(2)"></select>
-        <input id="p2NewName" placeholder="New player name" style="display:none;margin-top:8px" />
-        <button class="muted" id="p2SaveBtn" style="display:none;width:100%;margin-top:8px" onclick="saveNewPlayer(2)">Save New Player</button>
-      </div>
+  <div class="card">
+   <div class="utility"><button class="muted" onclick="undoBag()">Undo</button><button class="secondary" onclick="showSetup()">Players</button><button class="primary" onclick="resetGame()">Reset</button></div>
+   <div class="status" id="saveStatus">Auto-save ready.</div>
+  </div>
 
-      <label>Ghost Riley level</label>
-      <select id="ghostLevel">
-        <option value="4.5">Beginner Riley - 4.5 PPR</option>
-        <option value="6" selected>Pub Night Riley - 6.0 PPR</option>
-        <option value="7.5">Regional Riley - 7.5 PPR</option>
-        <option value="8.5">Demon Riley - 8.5 PPR</option>
-        <option value="10">World Beater Riley - 10.0 PPR</option>
-      </select>
-
-      <label>Game mode</label>
-      <select id="mode">
-        <option value="singles" selected>Singles - 1v1</option>
-        <option value="teams" disabled>Teams - 2v2 coming soon</option>
-        <option value="hybrid" disabled>2v1 + Riley coming soon</option>
-      </select>
-
-      <button class="primary" style="width:100%;margin-top:16px" onclick="startGame()">Start / Resume Practice</button>
-      <button class="muted" style="width:100%;margin-top:10px" onclick="newGame()">Start Brand New Game</button>
-
-      <div class="future tiny">Player IDs are saved on this device for now. Final games submit to your Google Sheet when you tap Submit Final Game.</div>
-    </div>
-  </section>
-
-  <section id="gameScreen" class="screen">
-    <div class="scoreboard">
-      <div class="card player-card p1">
-        <div class="player-head"><div class="player-name" id="p1Name">Player</div><div class="score" id="p1Score">0</div></div>
-        <div class="mini-stats">
-          <div class="mini"><b id="p1Ppr">0.00</b><span>PPR</span></div>
-          <div class="mini"><b id="p1Rounds">0</b><span>RDS</span></div>
-          <div class="mini"><b id="p1In">0</b><span>IN</span></div>
-          <div class="mini"><b id="p1On">0</b><span>ON</span></div>
-        </div>
-      </div>
-
-      <div class="card round-panel">
-        <div class="round-title">CURRENT THROW</div>
-        <div class="game-id" id="gameIdLabel">Game —</div>
-        <div class="bags" id="currentBags">— — — —</div>
-        <div class="tiny" id="pendingThrow"></div>
-        <div class="tiny" id="turnHelp">Tap four bags. In human mode, Player 2 throws next, then the round scores.</div>
-      </div>
-
-      <div class="card player-card p2">
-        <div class="player-head"><div class="player-name" id="p2Name">Riley 👻</div><div class="score" id="p2Score">0</div></div>
-        <div class="mini-stats">
-          <div class="mini"><b id="p2Ppr">0.00</b><span>PPR</span></div>
-          <div class="mini"><b id="p2Rounds">0</b><span>RDS</span></div>
-          <div class="mini"><b id="p2In">0</b><span>IN</span></div>
-          <div class="mini"><b id="p2On">0</b><span>ON</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="controls">
-        <button class="green" onclick="addBag(3,'🕳️')">IN<br>+3</button>
-        <button class="gold" onclick="addBag(1,'🟨')">ON<br>+1</button>
-        <button class="bad wide" onclick="addBag(0,'❌')">OFF +0</button>
-      </div>
-      <div class="utility">
-        <button class="muted" onclick="undoBag()">Undo</button>
-        <button class="secondary" onclick="showSetup()">Players</button>
-        <button class="primary" onclick="resetGame()">Reset</button>
-      </div>
-      <button id="submitBtn" class="green" style="width:100%;margin-top:10px" onclick="submitFinal()">Submit Final Game</button>
-      <button class="secondary" style="width:100%;margin-top:10px" onclick="openRemoteLink()">Open Pocket Remote</button>
-      <div class="status" id="saveStatus">Auto-save ready.</div>
-    </div>
-
-    <div class="card">
-      <strong>Rounds</strong>
-      <div class="tiny">Edit a round if you fat-fingered a bag. Scores and stats recalculate automatically.</div>
-      <div class="round-list" id="roundList"></div>
-    </div>
-  </section>
+  <div class="card"><strong>Rounds</strong><div class="tiny">Completed rounds update both player dashboards automatically.</div><div class="round-list" id="roundList"></div></div>
+ </section>
 </div>
-
 <script>
-const PREFS_KEY = 'rvcSanctuaryPractice.prefs.v4';
-const GAME_KEY = 'rvcSanctuaryPractice.activeGame.v4';
-const SUBMITTED_KEY = 'rvcSanctuaryPractice.submittedGames.v4';
-const PLAYERS_KEY = 'rvcSanctuaryPractice.players.v1';
-const SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwYE1RikwxPWIkJSMCuCvVzs5oCe2mAiCZJkUqOPGz2Ydy7qqF8oInfzNHtlzr8weLrwg/exec';
-
+const KEY='tossed.dashboard.v1', PLAYERS_KEY='rvcSanctuaryPractice.players.v1';
 let opponentType='riley';
-let game = defaultGame();
+const THEMES=['theme-rvc','theme-beach','theme-bridge'];
+let game=defaultGame();
 
-function defaultGame(){
-  return {
-    gameId: makeGameId(),
-    createdAt: new Date().toISOString(),
-    submittedAt: null,
-    isSubmitted: false,
-    mode:'singles',
-    opponentType:'riley',
-    ghostLevel:'6',
-    p1Id:'',
-    p2Id:'RILEY',
-    p1Name:'Player 1',
-    p2Name:'Riley 👻',
-    inputSide:1,
-    current:[],
-    currentIcons:[],
-    p1Pending:[],
-    p1PendingIcons:[],
-    rounds:[]
-  };
-}
-function makeGameId(){
-  const d=new Date();
-  const pad=n=>String(n).padStart(2,'0');
-  return `TOSSED-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
-}
-function makePlayerId(name){
-  const clean = (name || 'PLAYER').toUpperCase().replace(/[^A-Z0-9]+/g,'').slice(0,8) || 'PLAYER';
-  return `TOSSED-P-${clean}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
-}
-function getPlayers(){
-  let players=[];
-  try{ players=JSON.parse(localStorage.getItem(PLAYERS_KEY)||'[]'); }catch(e){}
-  if(!players.length){
-    players=[{id:makePlayerId('Jeremy'), name:'Jeremy', createdAt:new Date().toISOString()}];
-    localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
-  }
-  return players;
-}
-function setPlayers(players){ localStorage.setItem(PLAYERS_KEY, JSON.stringify(players)); }
-function refreshPlayerDropdowns(){
-  const players=getPlayers();
-  [1,2].forEach(side=>{
-    const select=document.getElementById(`p${side}Select`);
-    const selected=select.value;
-    select.innerHTML = players.map(p=>`<option value="${p.id}">${p.name}</option>`).join('') + `<option value="__new">+ Add new player</option>`;
-    if(players.some(p=>p.id===selected)) select.value=selected;
-  });
-}
-function handlePlayerSelect(side){
-  const val=document.getElementById(`p${side}Select`).value;
-  const show=val==='__new';
-  document.getElementById(`p${side}NewName`).style.display=show?'block':'none';
-  document.getElementById(`p${side}SaveBtn`).style.display=show?'block':'none';
-}
-function saveNewPlayer(side){
-  const input=document.getElementById(`p${side}NewName`);
-  const name=input.value.trim();
-  if(!name){ alert('Enter a player name first.'); return; }
-  const players=getPlayers();
-  const existing=players.find(p=>p.name.toLowerCase()===name.toLowerCase());
-  const player=existing || {id:makePlayerId(name), name, createdAt:new Date().toISOString()};
-  if(!existing) players.push(player);
-  setPlayers(players);
-  refreshPlayerDropdowns();
-  document.getElementById(`p${side}Select`).value=player.id;
-  input.value='';
-  handlePlayerSelect(side);
-  savePrefs();
-}
-function getSelectedPlayer(side){
-  const players=getPlayers();
-  const id=document.getElementById(`p${side}Select`).value;
-  return players.find(p=>p.id===id) || players[0];
-}
-function loadPrefs(){
-  refreshPlayerDropdowns();
-  try{
-    const saved=JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');
-    if(saved.p1Id) document.getElementById('p1Select').value=saved.p1Id;
-    if(saved.p2Id) document.getElementById('p2Select').value=saved.p2Id;
-    if(saved.opponentType==='human') chooseHuman(); else chooseRiley();
-    if(saved.ghostLevel) document.getElementById('ghostLevel').value=saved.ghostLevel;
-  }catch(e){}
-  try{
-    const savedGame=JSON.parse(localStorage.getItem(GAME_KEY)||'null');
-    if(savedGame && savedGame.gameId) game=savedGame;
-  }catch(e){}
-}
-function savePrefs(){
-  localStorage.setItem(PREFS_KEY, JSON.stringify({
-    p1Id: document.getElementById('p1Select').value,
-    p2Id: document.getElementById('p2Select').value,
-    opponentType,
-    ghostLevel: document.getElementById('ghostLevel').value
-  }));
-}
-function saveGame(){
-  localStorage.setItem(GAME_KEY, JSON.stringify(game));
-  const stamp=new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'});
-  document.getElementById('saveStatus').textContent = game.isSubmitted ? `Submitted and locked at ${stamp}` : `Saved locally at ${stamp}`;
-}
-function chooseRiley(){ opponentType='riley'; document.getElementById('humanOpponentBox').style.display='none'; }
-function chooseHuman(){ opponentType='human'; document.getElementById('humanOpponentBox').style.display='block'; refreshPlayerDropdowns(); }
-
-function startGame(){
-  if(document.getElementById('p1Select').value==='__new'){ alert('Save Player 1 first.'); return; }
-  if(opponentType==='human' && document.getElementById('p2Select').value==='__new'){ alert('Save Player 2 first.'); return; }
-  savePrefs();
-  const p1=getSelectedPlayer(1);
-  const p2=opponentType==='human' ? getSelectedPlayer(2) : {id:'RILEY', name:'Riley 👻'};
-  game.p1Id=p1.id; game.p1Name=p1.name;
-  game.opponentType=opponentType;
-  game.ghostLevel=document.getElementById('ghostLevel').value;
-  game.mode=document.getElementById('mode').value;
-  game.p2Id=p2.id; game.p2Name=p2.name;
-  showGame();
-  saveGame();
-}
-function newGame(){
-  if(!confirm('Start a brand new game and clear the current active game?')) return;
-  const keep = {
-    p1Id: document.getElementById('p1Select').value,
-    p2Id: document.getElementById('p2Select').value,
-    opponentType,
-    ghostLevel: document.getElementById('ghostLevel').value
-  };
-  game=defaultGame();
-  document.getElementById('p1Select').value=keep.p1Id;
-  document.getElementById('p2Select').value=keep.p2Id;
-  opponentType=keep.opponentType;
-  document.getElementById('ghostLevel').value=keep.ghostLevel;
-  if(opponentType==='human') chooseHuman(); else chooseRiley();
-  startGame();
-}
-function showGame(){
-  document.getElementById('p1Name').textContent=game.p1Name;
-  document.getElementById('p2Name').textContent=game.p2Name;
-  document.getElementById('setupScreen').classList.remove('active');
-  document.getElementById('gameScreen').classList.add('active');
-  update();
-}
-function showSetup(){
-  refreshPlayerDropdowns();
-  if(game.p1Id) document.getElementById('p1Select').value=game.p1Id;
-  if(game.p2Id && game.p2Id !== 'RILEY') document.getElementById('p2Select').value=game.p2Id;
-  if(game.opponentType==='human') chooseHuman(); else chooseRiley();
-  document.getElementById('ghostLevel').value=game.ghostLevel || '6';
-  document.getElementById('gameScreen').classList.remove('active');
-  document.getElementById('setupScreen').classList.add('active');
-}
-function addBag(points, icon){
-  if(game.isSubmitted){ alert('This game has already been submitted. Start a new game to keep playing.'); return; }
-  if(game.current.length>=4) return;
-  game.current.push(points); game.currentIcons.push(icon);
-  if(game.current.length===4) finishThrow();
-  saveGame(); update();
-}
-function undoBag(){
-  if(game.isSubmitted){ alert('This game has already been submitted. Start a new game to make changes.'); return; }
-  if(game.current.length===0) return;
-  game.current.pop(); game.currentIcons.pop();
-  saveGame(); update();
-}
-function finishThrow(){
-  if(game.inputSide===1){
-    const p1Bags=[...game.current];
-    const p1Icons=[...game.currentIcons];
-    if(game.opponentType==='riley'){
-      const g=ghostThrow();
-      addRound(p1Bags, g.arr, p1Icons, g.icons);
-      game.current=[]; game.currentIcons=[]; game.inputSide=1; game.p1Pending=[];
-    }else{
-      game.p1Pending=p1Bags;
-      game.p1PendingIcons=p1Icons;
-      game.current=[]; game.currentIcons=[]; game.inputSide=2;
-    }
-  }else{
-    addRound([...game.p1Pending], [...game.current], [...game.p1PendingIcons], [...game.currentIcons]);
-    game.current=[]; game.currentIcons=[]; game.inputSide=1; game.p1Pending=[]; game.p1PendingIcons=[];
-  }
-}
-function ghostThrow(){
-  const target=parseFloat(game.ghostLevel);
-  let pIn=Math.max(0.05, Math.min(0.78, target/12 - 0.08));
-  let pOn=Math.max(0.12, Math.min(0.55, (target - pIn*12)/4));
-  let arr=[], icons=[];
-  for(let i=0;i<4;i++){
-    let r=Math.random(), p=0, ic='❌';
-    if(r<pIn){p=3; ic='🕳️';}
-    else if(r<pIn+pOn){p=1; ic='🟨';}
-    arr.push(p); icons.push(ic);
-  }
-  return {arr,icons};
-}
-function iconsFromBags(bags){ return bags.map(p=>p===3?'🕳️':p===1?'🟨':'❌'); }
-function addRound(p1Bags,p2Bags,p1Icons,p2Icons){
-  const p1Pts=sum(p1Bags), p2Pts=sum(p2Bags), diff=p1Pts-p2Pts;
-  game.rounds.push({
-    roundNo: game.rounds.length+1,
-    p1Bags, p2Bags,
-    p1Icons: p1Icons || iconsFromBags(p1Bags),
-    p2Icons: p2Icons || iconsFromBags(p2Bags),
-    p1Pts, p2Pts,
-    scoreBy: diff>0 ? 1 : diff<0 ? 2 : 0,
-    scorePts: Math.abs(diff),
-    createdAt: new Date().toISOString()
-  });
-}
-function sum(arr){ return arr.reduce((a,b)=>a+b,0); }
-function calcStats(){
-  let p1Score=0,p2Score=0;
-  let p1={rounds:game.rounds.length,bags:0,pts:0,in:0,on:0,off:0};
-  let p2={rounds:game.rounds.length,bags:0,pts:0,in:0,on:0,off:0};
-  game.rounds.forEach(r=>{
-    const diff=r.p1Pts-r.p2Pts;
-    if(diff>0) p1Score+=diff;
-    if(diff<0) p2Score+=Math.abs(diff);
-    r.p1Bags.forEach(p=>countBag(p1,p));
-    r.p2Bags.forEach(p=>countBag(p2,p));
-  });
-  return {p1Score,p2Score,p1,p2};
-}
-function countBag(s,p){ s.bags++; s.pts+=p; if(p===3)s.in++; else if(p===1)s.on++; else s.off++; }
-function ppr(s){ return s.rounds ? (s.pts/s.rounds).toFixed(2) : '0.00'; }
-function update(){
-  const st=calcStats();
-  document.getElementById('p1Name').textContent=game.p1Name;
-  document.getElementById('p2Name').textContent=game.p2Name;
-  document.getElementById('gameIdLabel').textContent=`Game ${game.gameId}`;
-  document.getElementById('p1Score').textContent=st.p1Score;
-  document.getElementById('p2Score').textContent=st.p2Score;
-  document.getElementById('p1Ppr').textContent=ppr(st.p1);
-  document.getElementById('p2Ppr').textContent=ppr(st.p2);
-  document.getElementById('p1Rounds').textContent=st.p1.rounds;
-  document.getElementById('p2Rounds').textContent=st.p2.rounds;
-  document.getElementById('p1In').textContent=st.p1.in;
-  document.getElementById('p2In').textContent=st.p2.in;
-  document.getElementById('p1On').textContent=st.p1.on;
-  document.getElementById('p2On').textContent=st.p2.on;
-  const pendingEl=document.getElementById('pendingThrow');
-  if(game.inputSide===2 && game.p1PendingIcons && game.p1PendingIcons.length){
-    pendingEl.className='tiny pending-highlight';
-    pendingEl.textContent = `${game.p1Name} threw: ${game.p1PendingIcons.join(' ')}`;
-  }else{
-    pendingEl.className='tiny';
-    pendingEl.textContent = '';
-  }
-  document.getElementById('turnHelp').textContent = game.inputSide===1 ? `${game.p1Name} turn. Tap each bag result.` : `${game.p2Name} turn. Tap each bag result.`;
-  document.getElementById('currentBags').textContent = game.currentIcons.length ? game.currentIcons.join(' ') : '— — — —';
-  renderRounds();
-  const submitBtn=document.getElementById('submitBtn');
-  if(submitBtn){
-    submitBtn.disabled=!!game.isSubmitted;
-    submitBtn.textContent=game.isSubmitted ? 'Game Submitted / Locked' : 'Submit Final Game';
-  }
-}
-function renderRounds(){
-  const list=document.getElementById('roundList');
-  if(!game.rounds.length){ list.innerHTML='<div class="tiny">No completed rounds yet.</div>'; return; }
-  list.innerHTML=game.rounds.map((r,i)=>{
-    const diff=r.p1Pts-r.p2Pts;
-    const result=diff>0?`${game.p1Name} +${diff}`:diff<0?`${game.p2Name} +${Math.abs(diff)}`:'Wash';
-    return `<div class="round-item">
-      <div><b>Round ${i+1}</b> <small>${r.p1Pts}-${r.p2Pts} · ${result}</small><br>
-      <small>${game.p1Name}: ${r.p1Icons.join(' ')} | ${game.p2Name}: ${r.p2Icons.join(' ')}</small></div>
-      <button class="secondary" onclick="editRound(${i})">Edit</button>
-    </div>`;
-  }).join('');
-}
-function editRound(index){
-  if(game.isSubmitted){ alert('This game has already been submitted and is locked.'); return; }
-  const r=game.rounds[index];
-  const parse = (txt) => {
-    const vals = txt.split(',').map(x=>Number(x.trim())).filter(x=>[0,1,3].includes(x));
-    return vals.length===4 ? vals : null;
-  };
-  const p1txt=prompt(`Edit ${game.p1Name} bags for Round ${index+1}\nUse four numbers: 3=in, 1=on, 0=off`, r.p1Bags.join(','));
-  if(p1txt===null) return;
-  const p1=parse(p1txt);
-  if(!p1){ alert('Use exactly four values: 3, 1, or 0. Example: 3,1,0,3'); return; }
-  const p2txt=prompt(`Edit ${game.p2Name} bags for Round ${index+1}\nUse four numbers: 3=in, 1=on, 0=off`, r.p2Bags.join(','));
-  if(p2txt===null) return;
-  const p2=parse(p2txt);
-  if(!p2){ alert('Use exactly four values: 3, 1, or 0. Example: 3,1,0,3'); return; }
-  r.p1Bags=p1; r.p2Bags=p2; r.p1Icons=iconsFromBags(p1); r.p2Icons=iconsFromBags(p2);
-  r.p1Pts=sum(p1); r.p2Pts=sum(p2);
-  const diff=r.p1Pts-r.p2Pts;
-  r.scoreBy=diff>0?1:diff<0?2:0; r.scorePts=Math.abs(diff); r.editedAt=new Date().toISOString();
-  saveGame(); update();
-}
-function resetGame(){
-  if(game.isSubmitted){
-    if(confirm('This game has already been submitted. Start a brand new game instead?')) newGame();
-    return;
-  }
-  if(!confirm('Reset this active game?')) return;
-  const p1Name=game.p1Name, p2Name=game.p2Name, p1Id=game.p1Id, p2Id=game.p2Id, opp=game.opponentType, lvl=game.ghostLevel;
-  game=defaultGame();
-  game.p1Name=p1Name; game.p2Name=p2Name; game.p1Id=p1Id; game.p2Id=p2Id; game.opponentType=opp; game.ghostLevel=lvl;
-  saveGame(); update();
-}
-async function submitFinal(){
-  if(game.isSubmitted){
-    alert('This game was already submitted. Start a new game before submitting again.');
-    return;
-  }
-  if(!game.rounds.length){ alert('No completed rounds to submit yet.'); return; }
-  const st=calcStats();
-  const payload = {
-    ...game,
-    finalScoreP1: st.p1Score,
-    finalScoreP2: st.p2Score,
-    finalP1Stats: st.p1,
-    finalP2Stats: st.p2,
-    p1PPR: Number(ppr(st.p1)),
-    p2PPR: Number(ppr(st.p2)),
-    submittedAt: new Date().toISOString(),
-    isSubmitted: true
-  };
-
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=true;
-  btn.textContent='Submitting...';
-
-  const submitted=JSON.parse(localStorage.getItem(SUBMITTED_KEY)||'[]');
-  if(!submitted.some(g => g.gameId === payload.gameId)){
-    submitted.push(payload);
-    localStorage.setItem(SUBMITTED_KEY, JSON.stringify(submitted));
-  }
-
-  try {
-    await fetch(SHEET_WEB_APP_URL, {
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
-
-    game.submittedAt=payload.submittedAt;
-    game.isSubmitted=true;
-    saveGame();
-    update();
-
-    const startNew = confirm('Game submitted to Google Sheet. Start a brand new game now?');
-    if(startNew){
-      newGameAfterSubmit();
-    }else{
-      alert('Game is locked so it cannot be submitted twice.');
-    }
-  } catch(e) {
-    btn.disabled=false;
-    btn.textContent='Submit Final Game';
-    alert('Submit failed. The game is still saved locally and was not locked.');
-  }
-}
-
-function newGameAfterSubmit(){
-  const keep = {
-    p1Id: game.p1Id,
-    p2Id: game.p2Id,
-    opponentType: game.opponentType,
-    ghostLevel: game.ghostLevel
-  };
-  game=defaultGame();
-  game.opponentType=keep.opponentType;
-  game.ghostLevel=keep.ghostLevel;
-  const players=getPlayers();
-  const p1=players.find(p=>p.id===keep.p1Id) || players[0];
-  const p2=keep.opponentType==='human'
-    ? (players.find(p=>p.id===keep.p2Id) || players[0])
-    : {id:'RILEY', name:'Riley 👻'};
-  game.p1Id=p1.id; game.p1Name=p1.name;
-  game.p2Id=p2.id; game.p2Name=p2.name;
-  saveGame();
-  showGame();
-}
-
-function openRemoteLink(){
-  const remoteUrl = `remote.html?gameId=${encodeURIComponent(game.gameId)}&player=P1`;
-  window.open(remoteUrl, '_blank');
-}
-
-loadPrefs();
-if(game && game.gameId){
-  refreshPlayerDropdowns();
-  if(game.p1Id) document.getElementById('p1Select').value=game.p1Id;
-  if(game.p2Id && game.p2Id !== 'RILEY') document.getElementById('p2Select').value=game.p2Id;
-  opponentType = game.opponentType || 'riley';
-  if(opponentType==='human') chooseHuman(); else chooseRiley();
-  document.getElementById('ghostLevel').value = game.ghostLevel || '6';
-}
+function defaultGame(){return{gameId:makeGameId(),mode:'practice',roundTarget:10,opponentType:'riley',ghostLevel:'6',p1Name:'Jeremy',p2Name:'Riley 👻',inputSide:1,current:[],p1Pending:[],rounds:[],finished:false,themeIndex:0}}
+function makeGameId(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `TOSSED-${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`}
+function getPlayers(){try{const p=JSON.parse(localStorage.getItem(PLAYERS_KEY)||'[]');if(p.length)return p}catch(e){}return[{id:'JEREMY',name:'Jeremy'},{id:'KATE',name:'Kate'},{id:'MITCH',name:'Mitch'}]}
+function fillPlayers(){const p=getPlayers(),opts=p.map(x=>`<option value="${x.id}">${x.name}</option>`).join('');p1Select.innerHTML=opts;p2Select.innerHTML=opts;if(p.length>1)p2Select.selectedIndex=1}
+function setOpponent(type){opponentType=type;p2Box.style.display=type==='human'?'block':'none';rileyOptions.style.display=type==='riley'?'block':'none'}
+function toggleRoundOptions(){roundOptions.style.display=(gameMode.value==='skins'||gameMode.value==='rounders')?'block':'none'}
+function applyTheme(){document.body.classList.remove(...THEMES);document.body.classList.add(THEMES[game.themeIndex%THEMES.length])}
+function rotateTheme(){game.themeIndex=((game.themeIndex||0)+1)%THEMES.length;applyTheme()}
+function clampRounds(){roundTarget.value=Math.max(3,Math.min(99,Number(roundTarget.value)||10))}
+function selectedName(id){const el=document.getElementById(id);return el.options[el.selectedIndex]?.text||'Player'}
+function startGame(fresh){clampRounds();if(fresh||!localStorage.getItem(KEY)){game=defaultGame();game.gameId=makeGameId()}else{try{game=JSON.parse(localStorage.getItem(KEY))}catch(e){game=defaultGame()}}
+ game.mode=gameMode.value;game.roundTarget=Number(roundTarget.value);game.opponentType=opponentType;game.ghostLevel=ghostLevel.value;game.p1Name=selectedName('p1Select');game.p2Name=opponentType==='riley'?'Riley 👻':opponentType==='solo'?'Solo Session':selectedName('p2Select');game.finished=false;if(fresh)rotateTheme();else applyTheme();showGame();save()}
+function showGame(){setupScreen.classList.remove('active');gameScreen.classList.add('active');applyTheme();update()}
+function showSetup(){gameScreen.classList.remove('active');setupScreen.classList.add('active')}
+function save(){localStorage.setItem(KEY,JSON.stringify(game));saveStatus.textContent='Saved locally at '+new Date().toLocaleTimeString([], {hour:'numeric',minute:'2-digit'})}
+function addBag(side,points){if(game.finished)return;if(side!==game.inputSide)return;if(game.current.length>=4)return;game.current.push(points);if(game.current.length===4)finishThrow();save();update()}
+function undoBag(){if(game.current.length){game.current.pop();save();update()}}
+function finishThrow(){if(game.inputSide===1){if(game.opponentType==='solo'){addRound([...game.current],[]);game.current=[];game.inputSide=1}else if(game.opponentType==='riley'){const r=ghostThrow();addRound([...game.current],r);game.current=[];game.inputSide=1}else{game.p1Pending=[...game.current];game.current=[];game.inputSide=2}}else{addRound([...game.p1Pending],[...game.current]);game.p1Pending=[];game.current=[];game.inputSide=1}if((game.mode==='skins'||game.mode==='rounders')&&game.rounds.length>=game.roundTarget)game.finished=true}
+function ghostThrow(){const target=Number(game.ghostLevel);let pIn=Math.max(.05,Math.min(.78,target/12-.08));let pOn=Math.max(.12,Math.min(.55,(target-pIn*12)/4));return Array.from({length:4},()=>{const r=Math.random();return r<pIn?3:r<pIn+pOn?1:0})}
+function addRound(a,b){game.rounds.push({p1Bags:a,p2Bags:b,p1Pts:sum(a),p2Pts:sum(b)})}
+function sum(a){return a.reduce((x,y)=>x+y,0)}
+function stats(){let s1={rounds:game.rounds.length,bags:0,pts:0,in:0,on:0,off:0},s2=JSON.parse(JSON.stringify(s1)),score1=0,score2=0,skins1=0,skins2=0;
+ game.rounds.forEach(r=>{const d=r.p1Pts-r.p2Pts;if(game.mode==='skins'){if(d>0)skins1++;if(d<0)skins2++}else{if(d>0)score1+=d;if(d<0)score2+=-d}r.p1Bags.forEach(x=>count(s1,x));r.p2Bags.forEach(x=>count(s2,x))});
+ return{p1:s1,p2:s2,score1:game.mode==='skins'?skins1:game.mode==='rounders'?s1.pts:score1,score2:game.mode==='skins'?skins2:game.mode==='rounders'?s2.pts:score2}}
+function count(s,p){s.bags++;s.pts+=p;p===3?s.in++:p===1?s.on++:s.off++}
+function ppr(s){return s.rounds?(s.pts/s.rounds).toFixed(2):'0.00'}
+function offPct(s){return s.bags?Math.round(s.off/s.bags*100)+'%':'0%'}
+function icons(a){return a.map(x=>x===3?'🕳️':x===1?'🟡':'❌').join(' ')}
+function update(){const s=stats();p1Name.textContent=game.p1Name;p2Name.textContent=game.p2Name;p1Score.textContent=s.score1;p2Score.textContent=s.score2;
+ [['p1',s.p1],['p2',s.p2]].forEach(([p,x])=>{document.getElementById(p+'Ppr').textContent=ppr(x);document.getElementById(p+'Rounds').textContent=x.rounds;document.getElementById(p+'In').textContent=x.in;document.getElementById(p+'On').textContent=x.on;document.getElementById(p+'OffPct').textContent=offPct(x)});
+ gameIdLabel.textContent='Game '+game.gameId;currentBags.textContent=game.current.length?icons(game.current):'— — — —';currentThrowTotal.textContent=sum(game.current)+' PTS';pendingThrow.textContent=game.inputSide===2&&game.p1Pending.length?`${game.p1Name}: ${icons(game.p1Pending)}`:'';
+ modeLabel.textContent=game.mode==='skins'?'SKINS':game.mode==='rounders'?'ROUNDERS':'PRACTICE';roundProgress.textContent=(game.mode==='skins'||game.mode==='rounders')?`Round ${Math.min(game.rounds.length+1,game.roundTarget)} of ${game.roundTarget}`:`Round ${game.rounds.length+1}`;
+ turnLabel.textContent=game.finished?'MATCH COMPLETE':(game.inputSide===1?game.p1Name:game.p2Name)+"'s turn";
+ p2Dashboard.style.display=game.opponentType==='solo'?'none':'block';p1Controls.classList.toggle('inactive',game.inputSide!==1||game.finished);p2Controls.classList.toggle('inactive',game.inputSide!==2||game.opponentType==='riley'||game.opponentType==='solo'||game.finished);
+ roundList.innerHTML=game.rounds.length?game.rounds.map((r,i)=>`<div class="round-item"><div><b>Round ${i+1}</b><br><small>${game.opponentType==='solo'?`${game.p1Name} ${r.p1Pts}`:`${game.p1Name} ${r.p1Pts} · ${game.p2Name} ${r.p2Pts}`}</small></div><small>${icons(r.p1Bags)}${game.opponentType==='solo'?'':`<br>${icons(r.p2Bags)}`}</small></div>`).join(''):'<div class="tiny">No completed rounds yet.</div>'}
+function resetGame(){if(!confirm('Reset this match?'))return;const keep={...game};game=defaultGame();game.mode=keep.mode;game.roundTarget=keep.roundTarget;game.opponentType=keep.opponentType;game.ghostLevel=keep.ghostLevel;game.p1Name=keep.p1Name;game.p2Name=keep.p2Name;game.themeIndex=((keep.themeIndex||0)+1)%THEMES.length;applyTheme();save();update()}
+fillPlayers();setOpponent('riley');toggleRoundOptions();
+try{const saved=JSON.parse(localStorage.getItem(KEY)||'null');if(saved&&saved.gameId)game=saved}catch(e){}applyTheme();
 </script>
 </body>
 </html>

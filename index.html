@@ -223,15 +223,24 @@ button:disabled{opacity:.45;cursor:not-allowed}
       <div id="moreStats" class="shelf hidden"></div>
     </div>
 
-    <div id="linkDeviceCard" class="card hidden">
-      <h3>Link Another Device</h3>
-      <div class="tiny">On the second device, join this room and choose “Companion Device.”</div>
-      <div id="deviceLinkCode" class="link-code">------</div>
-      <div class="status">This code connects the second screen to this exact player seat.</div>
-      <button class="dark full" style="margin-top:12px" onclick="refreshLinkCode()">Generate New Code</button>
+    <div class="card throw">
+      <div class="throw-title">CURRENT THROW</div>
+      <div id="bags" class="bags">— — — —</div>
+      <div id="roundScore" class="score">0 PTS</div>
+      <div id="positionText" class="tiny">INSIDE</div>
+      <button id="undoButton" class="undo" aria-label="Undo last bag" onclick="undo()">↶</button>
     </div>
 
+    <div class="score-buttons">
+      <button id="inButton" class="in" onclick="toss('IN')">IN<br>+3</button>
+      <button id="onButton" class="on" onclick="toss('ON')">ON<br>+1</button>
+      <button id="offButton" class="off" onclick="toss('OFF')">OFF<br>+0</button>
+    </div>
+
+    <div id="saveStatus" class="status" style="text-align:center;margin-top:14px"></div>
+
     <div class="card">
+      <h3>Session Settings</h3>
       <div class="meta">
         <div>
           <label>Environment</label>
@@ -264,21 +273,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
       </button>
     </div>
 
-    <div class="card throw">
-      <div class="throw-title">CURRENT THROW</div>
-      <div id="bags" class="bags">— — — —</div>
-      <div id="roundScore" class="score">0 PTS</div>
-      <div id="positionText" class="tiny">INSIDE</div>
-      <button id="undoButton" class="undo" aria-label="Undo last bag" onclick="undo()">↶</button>
+    <div id="linkDeviceCard" class="card hidden">
+      <h3>Link Another Device</h3>
+      <div class="tiny">On the second device, join this room and choose “Companion Device.”</div>
+      <div id="deviceLinkCode" class="link-code">------</div>
+      <div class="status">This code connects the second screen to this exact player seat.</div>
+      <button class="dark full" style="margin-top:12px" onclick="refreshLinkCode()">Generate New Code</button>
     </div>
-
-    <div class="score-buttons">
-      <button id="inButton" class="in" onclick="toss('IN')">IN<br>+3</button>
-      <button id="onButton" class="on" onclick="toss('ON')">ON<br>+1</button>
-      <button id="offButton" class="off" onclick="toss('OFF')">OFF<br>+0</button>
-    </div>
-
-    <div id="saveStatus" class="status" style="text-align:center;margin-top:14px"></div>
   </section>
 </main>
 

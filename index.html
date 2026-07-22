@@ -1,968 +1,628 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<meta name="theme-color" content="#0b1711">
-<title>Tossed Toss Tracker</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#111827" />
+<title>TOSSED | Rogue Valley Cornhole</title>
 <style>
-:root{
-  --bg:#0b1711;--card:#173225;--card2:#203d2d;--cream:#fff1d2;
-  --muted:#d4c49e;--orange:#d65a0b;--green:#4d9560;--gold:#e3bb65;
-  --danger:#a83d2d;--line:#355744;--deep:#10251b
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:linear-gradient(#101613,#0a2015);
-  color:var(--cream);
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
-}
-button,input,select{font:inherit}
-button{touch-action:manipulation}
-.app{max-width:720px;margin:auto;padding:18px 16px 48px}
-.brand{text-align:center;margin:8px 0 20px}
-.brand h1{font-size:42px;letter-spacing:5px;margin:0}
-.brand p{margin:2px;color:var(--muted)}
-.card{
-  background:linear-gradient(145deg,var(--card),var(--card2));
-  border:1px solid var(--line);border-radius:25px;padding:18px;margin:14px 0;
-  box-shadow:0 12px 28px #0005
-}
-h2,h3{margin:0 0 10px}
-label{
-  display:block;font-size:11px;letter-spacing:1.4px;color:var(--muted);
-  margin:12px 0 6px;text-transform:uppercase
-}
-input,select{
-  width:100%;padding:14px;border-radius:14px;border:1px solid #58705e;
-  background:var(--deep);color:var(--cream)
-}
-button{
-  border:0;border-radius:16px;padding:15px;font-weight:800;cursor:pointer
-}
-button:disabled{opacity:.45;cursor:not-allowed}
-.primary{background:var(--orange);color:white}
-.secondary{background:var(--green);color:white}
-.gold{background:var(--gold);color:#18140b}
-.dark{background:#294a38;color:var(--cream)}
-.danger{background:var(--danger);color:white}
-.full{width:100%}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stack{display:grid;gap:10px}
-.hidden{display:none!important}
-.status,.tiny{font-size:12px;color:var(--muted);margin-top:9px}
-.status.good{color:#a9e4b5}.status.warn{color:#ffd69a}.status.bad{color:#ffafa3}
-.room-badge{
-  display:inline-flex;gap:7px;align-items:center;padding:7px 10px;border-radius:999px;
-  background:#10251b;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.7px
-}
-.dot{width:8px;height:8px;border-radius:50%;background:#7d827f}
-.dot.live{background:#62d477;box-shadow:0 0 0 4px #62d47722}
-.player-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.pid{font-size:11px;color:var(--muted)}
-.stats{
-  display:grid;grid-template-columns:repeat(5,1fr);margin-top:12px;
-  border-radius:16px;overflow:hidden
-}
-.stat{
-  background:#1b3126;padding:10px 3px;text-align:center;border-right:1px solid #ffffff0d
-}
-.stat:last-child{border:0}
-.stat b{display:block;font-size:17px}
-.stat small{font-size:9px;color:var(--muted)}
-.throw{
-  text-align:center;min-height:190px;display:flex;flex-direction:column;justify-content:center
-}
-.throw-title{font-size:12px;letter-spacing:3px;color:var(--muted)}
-.bags{font-size:31px;letter-spacing:8px;margin:14px 0 3px}
-.score{font-size:24px;font-weight:900}
-.undo{
-  margin:12px auto 0;width:56px;height:48px;font-size:26px;
-  background:#554d3e;color:white;padding:0
-}
-.score-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.score-buttons button{min-height:82px;font-size:20px}
-.in{background:#4b9860;color:white}
-.on{background:#e3bb65;color:#17140c}
-.off{background:#d4560e;color:white}
-.meta{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.more{width:100%;background:#294a38;color:var(--cream);margin-top:10px}
-.shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.shelf div{background:#10251b;padding:10px;border-radius:12px;text-align:center}
-.shelf b{display:block}
-.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.mode-card{
-  text-align:left;min-height:105px;background:#10251b;color:var(--cream);
-  border:1px solid #486651;padding:15px
-}
-.mode-card strong{display:block;font-size:16px;margin-bottom:5px}
-.mode-card span{display:block;color:var(--muted);font-size:12px;line-height:1.35}
-.seat-list{display:grid;gap:9px;margin-top:12px}
-.seat{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  background:#10251b;border:1px solid #355744;padding:12px;border-radius:15px
-}
-.seat-name{font-weight:900}
-.seat-meta{font-size:11px;color:var(--muted);margin-top:2px}
-.link-code{
-  font-size:34px;font-weight:950;letter-spacing:8px;text-align:center;
-  background:#10251b;border-radius:18px;padding:15px;margin:12px 0
-}
-.divider{height:1px;background:#ffffff18;margin:16px 0}
-@media(max-width:480px){
-  .mode-grid,.row,.meta{grid-template-columns:1fr}
-  .brand h1{font-size:38px}
-}
+  :root{
+    --rvc-orange:#D96A1B;
+    --rvc-orange-dark:#A94A13;
+    --rvc-forest:#31513A;
+    --rvc-forest-dark:#1D3527;
+    --rvc-charcoal:#181818;
+    --rvc-ink:#F5E9D2;
+    --rvc-muted:#D9C29C;
+    --rvc-card:#243B2B;
+    --rvc-card2:#18271E;
+    --rvc-gold:#D9B56B;
+    --rvc-green:#3F7A4B;
+    --rvc-bad:#B84F12;
+    --radius:22px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#111111 0%,#1D3527 48%,#0B0F0C 100%);color:var(--rvc-ink);}
+  body{padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+  .app{width:min(100%,480px);margin:0 auto;padding:14px 12px 28px}
+  .topbar{display:grid;grid-template-columns:54px 1fr 54px;align-items:center;gap:10px;margin-bottom:10px}
+  .logo-slot{height:54px;width:54px}
+  h1{margin:0;text-align:center;font-size:34px;letter-spacing:.08em;line-height:1.05;font-weight:1000}
+  .tag{text-align:center;color:var(--rvc-muted);font-size:12px;margin-top:3px}
+  .screen{display:none}.screen.active{display:block}
+  .card{background:linear-gradient(180deg,var(--rvc-card),var(--rvc-card2));border:1px solid rgba(255,255,255,.09);border-radius:var(--radius);box-shadow:0 14px 35px rgba(0,0,0,.35);padding:14px;margin:10px 0}
+  label{display:block;font-size:13px;color:var(--rvc-muted);margin:12px 0 6px}
+  input,select{width:100%;font-size:18px;color:var(--rvc-ink);background:#111811;border:1px solid rgba(255,255,255,.18);border-radius:14px;padding:13px 14px;outline:none}
+  input:focus,select:focus{border-color:var(--rvc-gold)}
+  .choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+  button{border:0;border-radius:18px;padding:15px 12px;font-weight:900;font-size:17px;color:white;background:#4b5563;box-shadow:0 8px 18px rgba(0,0,0,.25);cursor:pointer}
+  button:active{transform:translateY(1px)}
+  button:disabled{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
+  .primary{background:linear-gradient(135deg,var(--rvc-orange),var(--rvc-orange-dark))}
+  .secondary{background:linear-gradient(135deg,var(--rvc-forest),var(--rvc-forest-dark))}
+  .gold{background:var(--rvc-gold);color:#1a1302}.green{background:var(--rvc-green)}.bad{background:var(--rvc-bad)}.muted{background:#4B4234}
+  .scoreboard{display:grid;gap:10px}
+  .player-card{overflow:hidden;padding:0}
+  .player-head{display:grid;grid-template-columns:1fr 86px;align-items:center;min-height:78px}
+  .player-name{font-size:25px;font-weight:950;padding:13px 16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .score{height:100%;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:1000;background:#F5E9D2;color:#1D3527;border-radius:18px;margin:10px}
+  .p1 .player-head{background:linear-gradient(90deg,var(--rvc-orange-dark),var(--rvc-orange))}
+  .p2 .player-head{background:linear-gradient(90deg,var(--rvc-forest-dark),var(--rvc-forest))}
+  .mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.08)}
+  .mini{padding:8px 4px;text-align:center;background:rgba(0,0,0,.16)}
+  .mini b{display:block;font-size:17px}.mini span{font-size:10px;color:var(--rvc-muted)}
+  .round-panel{text-align:center}
+  .round-title{font-size:12px;color:var(--rvc-muted);font-weight:800;letter-spacing:.12em}
+  .game-id{font-size:11px;color:var(--rvc-muted);margin-top:2px;word-break:break-word}
+  .bags{font-size:28px;letter-spacing:4px;margin:8px 0 2px;min-height:38px}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.controls .wide{grid-column:1/-1}
+  .utility{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+  .utility button{font-size:13px;padding:12px 8px;border-radius:14px}
+  .tiny{color:var(--rvc-muted);font-size:12px;line-height:1.4}
+  .future{border:1px dashed rgba(243,183,43,.38);background:rgba(243,183,43,.07);border-radius:16px;padding:10px;margin-top:10px}
+  .round-list{display:grid;gap:8px;margin-top:10px}
+  .round-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;background:rgba(0,0,0,.18);border-radius:14px;padding:10px}
+  .round-item small{color:var(--rvc-muted)}
+  .round-item button{font-size:12px;padding:9px 10px;border-radius:12px}
+  .status{margin-top:10px;color:#F5E9D2;font-size:13px}
+  .pending-highlight{margin-top:6px;color:var(--rvc-gold);font-weight:800}
+  .inline-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  @media (max-width:380px){.app{padding-left:9px;padding-right:9px}h1{font-size:20px}.player-name{font-size:22px}.score{font-size:42px}button{font-size:16px}}
 </style>
 </head>
 <body>
-<main class="app">
-  <div class="brand">
-    <h1>TOSSED</h1>
-    <p>Rogue Valley Cornhole</p>
+<div class="app">
+  <div class="topbar">
+    <div class="logo-slot"></div>
+    <div><h1>TOSSED</h1><div class="tag">Rogue Valley Cornhole</div></div>
+    <div class="logo-slot"></div>
   </div>
 
-  <section id="home">
+  <section id="setupScreen" class="screen active">
     <div class="card">
-      <h2>Toss Tracker</h2>
-      <div class="tiny">Four bags at a time. Every round becomes part of your history.</div>
+      <label>Player 1</label>
+      <select id="p1Select" onchange="handlePlayerSelect(1)"></select>
+      <input id="p1NewName" placeholder="New player name" style="display:none;margin-top:8px" />
+      <button class="muted" id="p1SaveBtn" style="display:none;width:100%;margin-top:8px" onclick="saveNewPlayer(1)">Save New Player</button>
 
-      <label>Player name</label>
-      <input id="playerName" placeholder="Your name" autocomplete="name">
-      <div id="savedPlayer" class="status"></div>
-
-      <button class="primary full" style="margin-top:12px" onclick="continuePlayer()">Continue Solo</button>
-    </div>
-
-    <div class="card">
-      <h3>Live Room</h3>
-      <label>Private 4-digit room key</label>
-      <input id="roomCode" inputmode="numeric" maxlength="4" placeholder="2146">
-
-      <div class="row" style="margin-top:10px">
-        <button class="gold" onclick="createRoom()">Create Room</button>
-        <button class="secondary" onclick="findRoom()">Join Room</button>
+      <label>Opponent</label>
+      <div class="choice">
+        <button class="secondary" onclick="chooseRiley()">Play Riley 👻</button>
+        <button class="muted" onclick="chooseHuman()">Human Player</button>
       </div>
 
-      <div id="roomStatus" class="status">
-        Use a live room to connect players, reconnect a dropped screen, or link a companion device.
-      </div>
-    </div>
-  </section>
-
-  <section id="roomLobby" class="hidden">
-    <div class="card">
-      <div class="player-head">
-        <div>
-          <div class="room-badge"><span id="lobbyDot" class="dot"></span> ROOM <span id="lobbyRoomCode">----</span></div>
-          <h2 style="margin-top:10px">How are you joining?</h2>
-        </div>
-        <button class="dark" onclick="leaveRoom()">Back</button>
+      <div id="humanOpponentBox" style="display:none">
+        <label>Player 2</label>
+        <select id="p2Select" onchange="handlePlayerSelect(2)"></select>
+        <input id="p2NewName" placeholder="New player name" style="display:none;margin-top:8px" />
+        <button class="muted" id="p2SaveBtn" style="display:none;width:100%;margin-top:8px" onclick="saveNewPlayer(2)">Save New Player</button>
       </div>
 
-      <div class="mode-grid">
-        <button class="mode-card" onclick="joinAsPlayer()">
-          <strong>Join as Player</strong>
-          <span>Claim your own player seat and control your scoring dashboard.</span>
-        </button>
-
-        <button class="mode-card" onclick="showReconnectChoices()">
-          <strong>Rejoin Player</strong>
-          <span>Reconnect this screen to a player already seated in the room.</span>
-        </button>
-
-        <button class="mode-card" onclick="showCompanionJoin()">
-          <strong>Companion Device</strong>
-          <span>Link a second device to mirror and control the same player dashboard.</span>
-        </button>
-
-        <button class="mode-card" onclick="enterRoomAsDisplay()">
-          <strong>Room Display</strong>
-          <span>View the room without claiming a player or changing scores.</span>
-        </button>
-      </div>
-
-      <div id="lobbyAction" class="hidden">
-        <div class="divider"></div>
-        <div id="lobbyActionContent"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3>Players in Room</h3>
-      <div id="lobbySeats" class="seat-list"></div>
-      <div id="emptySeats" class="status">No players have joined yet.</div>
-    </div>
-  </section>
-
-  <section id="tracker" class="hidden">
-    <div class="card">
-      <div class="player-head">
-        <div>
-          <h2 id="displayName">Player</h2>
-          <div id="playerIdText" class="pid"></div>
-          <div id="activeRoomBadge" class="room-badge hidden" style="margin-top:8px">
-            <span id="activeRoomDot" class="dot"></span>
-            <span id="activeRoleLabel">ROOM</span> <span id="activeRoomCode">----</span>
-          </div>
-        </div>
-        <button class="secondary" onclick="showHome()">Home</button>
-      </div>
-
-      <div id="statsRow" class="stats"></div>
-      <button class="more" onclick="toggleMore()">More Stats ▾</button>
-      <div id="moreStats" class="shelf hidden"></div>
-    </div>
-
-    <div class="card throw">
-      <div class="throw-title">CURRENT THROW</div>
-      <div id="bags" class="bags">— — — —</div>
-      <div id="roundScore" class="score">0 PTS</div>
-      <div id="positionText" class="tiny">INSIDE</div>
-      <button id="undoButton" class="undo" aria-label="Undo last bag" onclick="undo()">↶</button>
-    </div>
-
-    <div class="score-buttons">
-      <button id="inButton" class="in" onclick="toss('IN')">IN<br>+3</button>
-      <button id="onButton" class="on" onclick="toss('ON')">ON<br>+1</button>
-      <button id="offButton" class="off" onclick="toss('OFF')">OFF<br>+0</button>
-    </div>
-
-    <div id="saveStatus" class="status" style="text-align:center;margin-top:14px"></div>
-
-    <div class="card">
-      <h3>Session Settings</h3>
-      <div class="meta">
-        <div>
-          <label>Environment</label>
-          <select id="environment">
-            <option value="indoor">Indoor</option>
-            <option value="outdoor">Outdoor</option>
-          </select>
-        </div>
-
-        <div>
-          <label>Start position</label>
-          <select id="startPosition">
-            <option value="inside">Inside</option>
-            <option value="outside">Outside</option>
-          </select>
-        </div>
-      </div>
-
-      <label>Stats window</label>
-      <select id="lookback" onchange="renderStats()">
-        <option value="session">Current session</option>
-        <option value="5">Last 5 rounds</option>
-        <option value="10">Last 10 rounds</option>
-        <option value="20">Last 20 rounds</option>
-        <option value="all">All time</option>
+      <label>Ghost Riley level</label>
+      <select id="ghostLevel">
+        <option value="4.5">Beginner Riley - 4.5 PPR</option>
+        <option value="6" selected>Pub Night Riley - 6.0 PPR</option>
+        <option value="7.5">Regional Riley - 7.5 PPR</option>
+        <option value="8.5">Demon Riley - 8.5 PPR</option>
+        <option value="10">World Beater Riley - 10.0 PPR</option>
       </select>
 
-      <button id="newSessionButton" class="gold full" style="margin-top:12px" onclick="newSession()">
-        Start New Session / Game
-      </button>
-    </div>
+      <label>Game mode</label>
+      <select id="mode">
+        <option value="singles" selected>Singles - 1v1</option>
+        <option value="teams" disabled>Teams - 2v2 coming soon</option>
+        <option value="hybrid" disabled>2v1 + Riley coming soon</option>
+      </select>
 
-    <div id="linkDeviceCard" class="card hidden">
-      <h3>Link Another Device</h3>
-      <div class="tiny">On the second device, join this room and choose “Companion Device.”</div>
-      <div id="deviceLinkCode" class="link-code">------</div>
-      <div class="status">This code connects the second screen to this exact player seat.</div>
-      <button class="dark full" style="margin-top:12px" onclick="refreshLinkCode()">Generate New Code</button>
+      <button class="primary" style="width:100%;margin-top:16px" onclick="startGame()">Start / Resume Practice</button>
+      <button class="muted" style="width:100%;margin-top:10px" onclick="newGame()">Start Brand New Game</button>
+
+      <div class="future tiny">Player IDs are saved on this device for now. Final games submit to your Google Sheet when you tap Submit Final Game.</div>
     </div>
   </section>
-</main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL="https://gymkbeqmvuhlivobnyvd.supabase.co";
-const SUPABASE_KEY="sb_publishable_XCutLWC_6v7mXOUa3qaHgw_U3y5fW-U";
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-
-const score={IN:3,ON:1,OFF:0};
-
-let player=JSON.parse(localStorage.getItem("tossed_player")||"null");
-let deviceId=localStorage.getItem("tossed_device_id")||crypto.randomUUID();
-let sessionId=null;
-let current=[];
-let rounds=[];
-let position="inside";
-let room=null;
-let roomState={version:1,seats:[],updated_at:null};
-let roomChannel=null;
-let saving=false;
-let activeSeatId=null;
-let activeRole="solo"; // solo | player | companion | display
-let applyingRemote=false;
-
-localStorage.setItem("tossed_device_id",deviceId);
-
-if(player){
-  playerName.value=player.display_name;
-  savedPlayer.textContent="Saved player: "+player.display_name+" · "+player.player_id.slice(0,8).toUpperCase();
-}
-
-function setStatus(el,text,type=""){
-  el.textContent=text;
-  el.className="status"+(type?" "+type:"");
-}
-
-function cleanRoomCode(){
-  return roomCode.value.replace(/\D/g,"").slice(0,4);
-}
-
-function normalizeState(raw){
-  const state=raw&&typeof raw==="object"?raw:{};
-  return {
-    version:state.version||1,
-    seats:Array.isArray(state.seats)?state.seats:[],
-    updated_at:state.updated_at||null
-  };
-}
-
-function makeLinkCode(){
-  return String(Math.floor(100000+Math.random()*900000));
-}
-
-function findSeat(seatId=activeSeatId){
-  return roomState.seats.find(s=>s.seat_id===seatId)||null;
-}
-
-function findSeatByPlayerId(playerId){
-  return roomState.seats.find(s=>s.player_id===playerId)||null;
-}
-
-function ownSeat(){
-  return activeSeatId?findSeat(activeSeatId):null;
-}
-
-async function ensurePlayer(){
-  const name=playerName.value.trim();
-  if(!name){
-    setStatus(savedPlayer,"Enter a player name first.","warn");
-    return null;
-  }
-
-  if(!player||player.display_name!==name){
-    const {data,error}=await sb.from("players").insert({display_name:name}).select().single();
-    if(error){
-      setStatus(savedPlayer,error.message,"bad");
-      return null;
-    }
-    player=data;
-    localStorage.setItem("tossed_player",JSON.stringify(player));
-  }
-  return player;
-}
-
-async function continuePlayer(){
-  const p=await ensurePlayer();
-  if(!p)return;
-
-  activeRole="solo";
-  room=null;
-  activeSeatId=null;
-  await openTracker();
-  await newSession();
-}
-
-async function createRoom(){
-  const p=await ensurePlayer();
-  if(!p)return;
-
-  const c=cleanRoomCode();
-  if(c.length!==4){
-    setStatus(roomStatus,"Enter exactly 4 digits.","warn");
-    return;
-  }
-
-  const initial={version:1,seats:[],updated_at:new Date().toISOString()};
-  const {error}=await sb.from("live_rooms").insert({room_code:c,game_state:initial});
-
-  if(error&&error.code!=="23505"){
-    setStatus(roomStatus,error.message,"bad");
-    return;
-  }
-
-  if(error&&error.code==="23505"){
-    setStatus(roomStatus,"That room already exists — opening it instead.","warn");
-  }else{
-    setStatus(roomStatus,"Room "+c+" created.","good");
-  }
-
-  await enterLobby(c);
-}
-
-async function findRoom(){
-  const p=await ensurePlayer();
-  if(!p)return;
-
-  const c=cleanRoomCode();
-  if(c.length!==4){
-    setStatus(roomStatus,"Enter exactly 4 digits.","warn");
-    return;
-  }
-
-  const {data,error}=await sb.from("live_rooms")
-    .select("room_code,game_state")
-    .eq("room_code",c)
-    .maybeSingle();
-
-  if(error){
-    setStatus(roomStatus,error.message,"bad");
-    return;
-  }
-  if(!data){
-    setStatus(roomStatus,"Room not found.","warn");
-    return;
-  }
-
-  await enterLobby(c,data.game_state);
-}
-
-async function enterLobby(code,knownState=null){
-  room=code;
-  localStorage.setItem("tossed_last_room",room);
-
-  if(knownState){
-    roomState=normalizeState(knownState);
-  }else{
-    await fetchRoomState();
-  }
-
-  home.classList.add("hidden");
-  tracker.classList.add("hidden");
-  roomLobby.classList.remove("hidden");
-  lobbyRoomCode.textContent=room;
-
-  await subscribeToRoom();
-  renderLobby();
-}
-
-async function fetchRoomState(){
-  if(!room)return;
-  const {data,error}=await sb.from("live_rooms")
-    .select("game_state")
-    .eq("room_code",room)
-    .single();
-
-  if(error)throw error;
-  roomState=normalizeState(data.game_state);
-}
-
-async function writeRoomState(nextState){
-  if(!room)return false;
-
-  nextState.updated_at=new Date().toISOString();
-  const {data,error}=await sb.from("live_rooms")
-    .update({game_state:nextState})
-    .eq("room_code",room)
-    .select("game_state")
-    .single();
-
-  if(error){
-    console.error(error);
-    return false;
-  }
-
-  roomState=normalizeState(data.game_state);
-  renderLobby();
-  syncTrackerFromSeat();
-  return true;
-}
-
-async function mutateRoomState(mutator){
-  await fetchRoomState();
-  const draft=structuredClone(roomState);
-  await mutator(draft);
-  return writeRoomState(draft);
-}
-
-async function subscribeToRoom(){
-  if(roomChannel){
-    await sb.removeChannel(roomChannel);
-    roomChannel=null;
-  }
-  if(!room)return;
-
-  roomChannel=sb.channel("tossed-room-"+room)
-    .on("postgres_changes",{
-      event:"UPDATE",
-      schema:"public",
-      table:"live_rooms",
-      filter:"room_code=eq."+room
-    },payload=>{
-      roomState=normalizeState(payload.new.game_state);
-      renderLobby();
-      syncTrackerFromSeat();
-    })
-    .subscribe(status=>{
-      const live=status==="SUBSCRIBED";
-      lobbyDot.classList.toggle("live",live);
-      activeRoomDot.classList.toggle("live",live);
-    });
-}
-
-async function joinAsPlayer(){
-  const p=await ensurePlayer();
-  if(!p)return;
-
-  const existing=findSeatByPlayerId(p.player_id);
-  if(existing){
-    activeSeatId=existing.seat_id;
-    activeRole="player";
-    existing.device_ids=[...new Set([...(existing.device_ids||[]),deviceId])];
-    existing.last_seen=new Date().toISOString();
-    await writeRoomState(roomState);
-    await openRoomTracker();
-    return;
-  }
-
-  const seat={
-    seat_id:crypto.randomUUID(),
-    player_id:p.player_id,
-    display_name:p.display_name,
-    owner_device_id:deviceId,
-    device_ids:[deviceId],
-    link_code:makeLinkCode(),
-    session_id:null,
-    current:[],
-    position:"inside",
-    environment:"indoor",
-    starting_position:"inside",
-    last_round_number:0,
-    status:"active",
-    last_seen:new Date().toISOString()
-  };
-
-  const ok=await mutateRoomState(state=>state.seats.push(seat));
-  if(!ok)return;
-
-  activeSeatId=seat.seat_id;
-  activeRole="player";
-  await openRoomTracker();
-}
-
-function showReconnectChoices(){
-  lobbyAction.classList.remove("hidden");
-  const seats=roomState.seats;
-
-  lobbyActionContent.innerHTML=`
-    <h3>Rejoin a Player</h3>
-    <div class="tiny">Choose the player this screen should reconnect to.</div>
-    <div class="seat-list" style="margin-top:12px">
-      ${seats.length?seats.map(s=>`
-        <button class="seat" style="color:var(--cream);text-align:left" onclick="rejoinSeat('${s.seat_id}')">
-          <span>
-            <span class="seat-name">${escapeHtml(s.display_name)}</span>
-            <span class="seat-meta">Player seat · ${s.device_ids?.length||1} linked device(s)</span>
-          </span>
-          <span>REJOIN</span>
-        </button>`).join(""):`<div class="status">There are no player seats to rejoin yet.</div>`}
-    </div>`;
-}
-
-async function rejoinSeat(seatId){
-  const seat=findSeat(seatId);
-  if(!seat)return;
-
-  activeSeatId=seatId;
-  activeRole="player";
-
-  await mutateRoomState(state=>{
-    const target=state.seats.find(s=>s.seat_id===seatId);
-    if(!target)return;
-    target.owner_device_id=deviceId;
-    target.device_ids=[...new Set([...(target.device_ids||[]),deviceId])];
-    target.last_seen=new Date().toISOString();
-  });
-
-  player={
-    player_id:seat.player_id,
-    display_name:seat.display_name
-  };
-  localStorage.setItem("tossed_player",JSON.stringify(player));
-  await openRoomTracker();
-}
-
-function showCompanionJoin(){
-  lobbyAction.classList.remove("hidden");
-  lobbyActionContent.innerHTML=`
-    <h3>Link Companion Device</h3>
-    <div class="tiny">Enter the 6-digit link code shown on the player’s main dashboard.</div>
-    <label>Companion link code</label>
-    <input id="companionCodeInput" inputmode="numeric" maxlength="6" placeholder="123456">
-    <button class="gold full" style="margin-top:12px" onclick="joinCompanion()">Link Device</button>
-    <div id="companionJoinStatus" class="status"></div>`;
-}
-
-async function joinCompanion(){
-  const input=document.getElementById("companionCodeInput");
-  const status=document.getElementById("companionJoinStatus");
-  const code=(input?.value||"").replace(/\D/g,"").slice(0,6);
-  const seat=roomState.seats.find(s=>s.link_code===code);
-
-  if(!seat){
-    setStatus(status,"No player in this room matches that link code.","warn");
-    return;
-  }
-
-  activeSeatId=seat.seat_id;
-  activeRole="companion";
-
-  await mutateRoomState(state=>{
-    const target=state.seats.find(s=>s.seat_id===seat.seat_id);
-    target.device_ids=[...new Set([...(target.device_ids||[]),deviceId])];
-    target.last_seen=new Date().toISOString();
-  });
-
-  player={player_id:seat.player_id,display_name:seat.display_name};
-  await openRoomTracker();
-}
-
-async function enterRoomAsDisplay(){
-  activeRole="display";
-  activeSeatId=roomState.seats[0]?.seat_id||null;
-  if(!activeSeatId){
-    setStatus(roomStatus,"The room has no players to display yet.","warn");
-    return;
-  }
-  await openRoomTracker();
-}
-
-async function openRoomTracker(){
-  const seat=ownSeat();
-  if(!seat)return;
-
-  player={player_id:seat.player_id,display_name:seat.display_name};
-  position=seat.position||seat.starting_position||"inside";
-  current=Array.isArray(seat.current)?[...seat.current]:[];
-  sessionId=seat.session_id||null;
-
-  environment.value=seat.environment||"indoor";
-  startPosition.value=seat.starting_position||"inside";
-
-  await openTracker();
-
-  if(!sessionId&&activeRole!=="display"){
-    await newSession();
-  }else{
-    await loadRounds();
-    render();
-  }
-}
-
-async function openTracker(){
-  home.classList.add("hidden");
-  roomLobby.classList.add("hidden");
-  tracker.classList.remove("hidden");
-
-  displayName.textContent=player.display_name;
-  playerIdText.textContent="PLAYER "+player.player_id.slice(0,8).toUpperCase();
-
-  const inRoom=Boolean(room);
-  activeRoomBadge.classList.toggle("hidden",!inRoom);
-  activeRoomCode.textContent=room||"----";
-
-  const companion=activeRole==="companion";
-  activeRoleLabel.textContent=companion?"COMPANION · ROOM":"ROOM";
-
-  linkDeviceCard.classList.toggle("hidden",!(inRoom&&activeRole==="player"));
-  const seat=ownSeat();
-  deviceLinkCode.textContent=seat?.link_code||"------";
-
-  const readOnly=activeRole==="display";
-  [inButton,onButton,offButton,undoButton,newSessionButton,environment,startPosition]
-    .forEach(el=>el.disabled=readOnly);
-
-  render();
-}
-
-async function refreshLinkCode(){
-  if(!activeSeatId)return;
-  const code=makeLinkCode();
-
-  await mutateRoomState(state=>{
-    const seat=state.seats.find(s=>s.seat_id===activeSeatId);
-    if(seat)seat.link_code=code;
-  });
-
-  deviceLinkCode.textContent=code;
-}
-
-async function newSession(){
-  if(!player||activeRole==="display")return;
-
-  current=[];
-  position=startPosition.value;
-  saveStatus.textContent="Starting session…";
-
-  const {data,error}=await sb.from("throw_sessions")
-    .insert({
-      player_id:player.player_id,
-      room_code:room,
-      environment:environment.value,
-      starting_position:position
-    })
-    .select()
-    .single();
-
-  if(error){
-    saveStatus.textContent="Session error: "+error.message;
-    return;
-  }
-
-  sessionId=data.session_id;
-  await loadRounds();
-
-  if(room&&activeSeatId){
-    await mutateRoomState(state=>{
-      const seat=state.seats.find(s=>s.seat_id===activeSeatId);
-      if(!seat)return;
-      seat.session_id=sessionId;
-      seat.current=[];
-      seat.position=position;
-      seat.environment=environment.value;
-      seat.starting_position=startPosition.value;
-      seat.last_round_number=0;
-      seat.last_seen=new Date().toISOString();
-    });
-  }
-
-  saveStatus.textContent="Session ready";
-  render();
-}
-
-async function loadRounds(){
-  if(!player)return;
-  const {data,error}=await sb.from("rounds")
-    .select("*")
-    .eq("player_id",player.player_id)
-    .order("thrown_at",{ascending:true});
-
-  if(error){
-    saveStatus.textContent="Could not load history: "+error.message;
-    return;
-  }
-  rounds=data||[];
-}
-
-async function syncSeatState(){
-  if(!room||!activeSeatId||applyingRemote)return;
-
-  await mutateRoomState(state=>{
-    const seat=state.seats.find(s=>s.seat_id===activeSeatId);
-    if(!seat)return;
-    seat.current=[...current];
-    seat.position=position;
-    seat.session_id=sessionId;
-    seat.environment=environment.value;
-    seat.starting_position=startPosition.value;
-    seat.last_seen=new Date().toISOString();
-  });
-}
-
-function syncTrackerFromSeat(){
-  if(!room||!activeSeatId)return;
-  const seat=ownSeat();
-  if(!seat)return;
-
-  applyingRemote=true;
-  current=Array.isArray(seat.current)?[...seat.current]:[];
-  position=seat.position||"inside";
-  sessionId=seat.session_id||sessionId;
-  environment.value=seat.environment||environment.value;
-  startPosition.value=seat.starting_position||startPosition.value;
-  deviceLinkCode.textContent=seat.link_code||"------";
-  applyingRemote=false;
-
-  render();
-}
-
-function showHome(){
-  tracker.classList.add("hidden");
-  roomLobby.classList.add("hidden");
-  home.classList.remove("hidden");
-  leaveRealtimeOnly();
-  room=null;
-  activeSeatId=null;
-  activeRole="solo";
-}
-
-async function leaveRoom(){
-  roomLobby.classList.add("hidden");
-  home.classList.remove("hidden");
-  await leaveRealtimeOnly();
-  room=null;
-  activeSeatId=null;
-  activeRole="solo";
-}
-
-async function leaveRealtimeOnly(){
-  if(roomChannel){
-    await sb.removeChannel(roomChannel);
-    roomChannel=null;
-  }
-}
-
-async function toss(v){
-  if(activeRole==="display"||current.length>=4||saving)return;
-  current.push(v);
-  render();
-  if(room)await syncSeatState();
-  if(current.length===4)setTimeout(saveRound,250);
-}
-
-async function undo(){
-  if(activeRole==="display"||saving||!current.length)return;
-  current.pop();
-  render();
-  if(room)await syncSeatState();
-}
-
-async function saveRound(){
-  if(current.length!==4||!sessionId||saving||activeRole==="display")return;
-  saving=true;
-
-  const snapshot=[...current];
-  const pts=snapshot.reduce((a,b)=>a+score[b],0);
-  const rn=rounds.filter(r=>r.session_id===sessionId).length+1;
-
-  const payload={
-    session_id:sessionId,
-    player_id:player.player_id,
-    round_number:rn,
-    position,
-    bag_1:snapshot[0],
-    bag_2:snapshot[1],
-    bag_3:snapshot[2],
-    bag_4:snapshot[3],
-    points:pts
-  };
-
-  const {data,error}=await sb.from("rounds").insert(payload).select().single();
-
-  if(error){
-    saveStatus.textContent="Save error: "+error.message;
-    saving=false;
-    return;
-  }
-
-  rounds.push(data);
-  saveStatus.textContent="Round "+rn+" saved · "+pts+" points";
-  current=[];
-  position=position==="inside"?"outside":"inside";
-  saving=false;
-  render();
-
-  if(room){
-    await mutateRoomState(state=>{
-      const seat=state.seats.find(s=>s.seat_id===activeSeatId);
-      if(!seat)return;
-      seat.current=[];
-      seat.position=position;
-      seat.last_round_number=rn;
-      seat.last_points=pts;
-      seat.last_seen=new Date().toISOString();
-    });
-  }
-}
-
-function windowRounds(){
-  const v=lookback.value;
-  if(v==="session")return rounds.filter(r=>r.session_id===sessionId);
-  if(v==="all")return rounds;
-  return rounds.slice(-Number(v));
-}
-
-function calc(rs){
-  const n=rs.length;
-  const b=n*4;
-  const pts=rs.reduce((a,r)=>a+r.points,0);
-  const vals=rs.flatMap(r=>[r.bag_1,r.bag_2,r.bag_3,r.bag_4]);
-
-  return{
-    ppr:n?(pts/n).toFixed(2):"0.00",
-    rounds:n,
-    in_pct:b?Math.round(vals.filter(x=>x==="IN").length/b*100)+"%":"0%",
-    on_pct:b?Math.round(vals.filter(x=>x==="ON").length/b*100)+"%":"0%",
-    off_pct:b?Math.round(vals.filter(x=>x==="OFF").length/b*100)+"%":"0%",
-    board_pct:b?Math.round(vals.filter(x=>x!=="OFF").length/b*100)+"%":"0%",
-    bags:b,
-    total_points:pts,
-    ten_plus:rs.filter(r=>r.points>=10).length,
-    clean:rs.filter(r=>![r.bag_1,r.bag_2,r.bag_3,r.bag_4].includes("OFF")).length
-  };
-}
-
-function renderStats(){
-  const s=calc(windowRounds());
-  const p=[
-    ["PPR",s.ppr],["RDS",s.rounds],["IN",s.in_pct],
-    ["OFF",s.off_pct],["POS",position.toUpperCase()]
-  ];
-
-  statsRow.innerHTML=p.map(x=>
-    '<div class="stat"><b>'+x[1]+'</b><small>'+x[0]+'</small></div>'
-  ).join("");
-
-  moreStats.innerHTML=[
-    ["ON",s.on_pct],["BOARD",s.board_pct],["BAGS",s.bags],
-    ["POINTS",s.total_points],["10+",s.ten_plus],["CLEAN",s.clean]
-  ].map(x=>
-    '<div><b>'+x[1]+'</b><small>'+x[0]+'</small></div>'
-  ).join("");
-}
-
-function render(){
-  const symbols={IN:"●",ON:"○",OFF:"×"};
-  bags.textContent=[...current,...Array(4-current.length).fill("—")]
-    .map(x=>symbols[x]||x).join(" ");
-  roundScore.textContent=current.reduce((a,b)=>a+score[b],0)+" PTS";
-  positionText.textContent=position.toUpperCase();
-  renderStats();
-}
-
-function renderLobby(){
-  if(!room)return;
-
-  lobbyRoomCode.textContent=room;
-  const seats=roomState.seats||[];
-  emptySeats.classList.toggle("hidden",seats.length>0);
-
-  lobbySeats.innerHTML=seats.map(seat=>`
-    <div class="seat">
-      <div>
-        <div class="seat-name">${escapeHtml(seat.display_name)}</div>
-        <div class="seat-meta">
-          ${seat.device_ids?.length||1} linked device(s)
-          ${seat.last_points!=null?" · Last round "+seat.last_points+" pts":""}
+  <section id="gameScreen" class="screen">
+    <div class="scoreboard">
+      <div class="card player-card p1">
+        <div class="player-head"><div class="player-name" id="p1Name">Player</div><div class="score" id="p1Score">0</div></div>
+        <div class="mini-stats">
+          <div class="mini"><b id="p1Ppr">0.00</b><span>PPR</span></div>
+          <div class="mini"><b id="p1Rounds">0</b><span>RDS</span></div>
+          <div class="mini"><b id="p1In">0</b><span>IN</span></div>
+          <div class="mini"><b id="p1On">0</b><span>ON</span></div>
         </div>
       </div>
-      <div class="room-badge"><span class="dot live"></span> ACTIVE</div>
+
+      <div class="card round-panel">
+        <div class="round-title">CURRENT THROW</div>
+        <div class="game-id" id="gameIdLabel">Game —</div>
+        <div class="bags" id="currentBags">— — — —</div>
+        <div class="tiny" id="pendingThrow"></div>
+        <div class="tiny" id="turnHelp">Tap four bags. In human mode, Player 2 throws next, then the round scores.</div>
+      </div>
+
+      <div class="card player-card p2">
+        <div class="player-head"><div class="player-name" id="p2Name">Riley 👻</div><div class="score" id="p2Score">0</div></div>
+        <div class="mini-stats">
+          <div class="mini"><b id="p2Ppr">0.00</b><span>PPR</span></div>
+          <div class="mini"><b id="p2Rounds">0</b><span>RDS</span></div>
+          <div class="mini"><b id="p2In">0</b><span>IN</span></div>
+          <div class="mini"><b id="p2On">0</b><span>ON</span></div>
+        </div>
+      </div>
     </div>
-  `).join("");
+
+    <div class="card">
+      <div class="controls">
+        <button class="green" onclick="addBag(3,'🕳️')">IN<br>+3</button>
+        <button class="gold" onclick="addBag(1,'🟨')">ON<br>+1</button>
+        <button class="bad wide" onclick="addBag(0,'❌')">OFF +0</button>
+      </div>
+      <div class="utility">
+        <button class="muted" onclick="undoBag()">Undo</button>
+        <button class="secondary" onclick="showSetup()">Players</button>
+        <button class="primary" onclick="resetGame()">Reset</button>
+      </div>
+      <button id="submitBtn" class="green" style="width:100%;margin-top:10px" onclick="submitFinal()">Submit Final Game</button>
+      <button class="secondary" style="width:100%;margin-top:10px" onclick="openRemoteLink()">Open Pocket Remote</button>
+      <div class="status" id="saveStatus">Auto-save ready.</div>
+    </div>
+
+    <div class="card">
+      <strong>Rounds</strong>
+      <div class="tiny">Edit a round if you fat-fingered a bag. Scores and stats recalculate automatically.</div>
+      <div class="round-list" id="roundList"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const PREFS_KEY = 'rvcSanctuaryPractice.prefs.v4';
+const GAME_KEY = 'rvcSanctuaryPractice.activeGame.v4';
+const SUBMITTED_KEY = 'rvcSanctuaryPractice.submittedGames.v4';
+const PLAYERS_KEY = 'rvcSanctuaryPractice.players.v1';
+const SHEET_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwYE1RikwxPWIkJSMCuCvVzs5oCe2mAiCZJkUqOPGz2Ydy7qqF8oInfzNHtlzr8weLrwg/exec';
+
+let opponentType='riley';
+let game = defaultGame();
+
+function defaultGame(){
+  return {
+    gameId: makeGameId(),
+    createdAt: new Date().toISOString(),
+    submittedAt: null,
+    isSubmitted: false,
+    mode:'singles',
+    opponentType:'riley',
+    ghostLevel:'6',
+    p1Id:'',
+    p2Id:'RILEY',
+    p1Name:'Player 1',
+    p2Name:'Riley 👻',
+    inputSide:1,
+    current:[],
+    currentIcons:[],
+    p1Pending:[],
+    p1PendingIcons:[],
+    rounds:[]
+  };
+}
+function makeGameId(){
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  return `TOSSED-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+}
+function makePlayerId(name){
+  const clean = (name || 'PLAYER').toUpperCase().replace(/[^A-Z0-9]+/g,'').slice(0,8) || 'PLAYER';
+  return `TOSSED-P-${clean}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+}
+function getPlayers(){
+  let players=[];
+  try{ players=JSON.parse(localStorage.getItem(PLAYERS_KEY)||'[]'); }catch(e){}
+  if(!players.length){
+    players=[{id:makePlayerId('Jeremy'), name:'Jeremy', createdAt:new Date().toISOString()}];
+    localStorage.setItem(PLAYERS_KEY, JSON.stringify(players));
+  }
+  return players;
+}
+function setPlayers(players){ localStorage.setItem(PLAYERS_KEY, JSON.stringify(players)); }
+function refreshPlayerDropdowns(){
+  const players=getPlayers();
+  [1,2].forEach(side=>{
+    const select=document.getElementById(`p${side}Select`);
+    const selected=select.value;
+    select.innerHTML = players.map(p=>`<option value="${p.id}">${p.name}</option>`).join('') + `<option value="__new">+ Add new player</option>`;
+    if(players.some(p=>p.id===selected)) select.value=selected;
+  });
+}
+function handlePlayerSelect(side){
+  const val=document.getElementById(`p${side}Select`).value;
+  const show=val==='__new';
+  document.getElementById(`p${side}NewName`).style.display=show?'block':'none';
+  document.getElementById(`p${side}SaveBtn`).style.display=show?'block':'none';
+}
+function saveNewPlayer(side){
+  const input=document.getElementById(`p${side}NewName`);
+  const name=input.value.trim();
+  if(!name){ alert('Enter a player name first.'); return; }
+  const players=getPlayers();
+  const existing=players.find(p=>p.name.toLowerCase()===name.toLowerCase());
+  const player=existing || {id:makePlayerId(name), name, createdAt:new Date().toISOString()};
+  if(!existing) players.push(player);
+  setPlayers(players);
+  refreshPlayerDropdowns();
+  document.getElementById(`p${side}Select`).value=player.id;
+  input.value='';
+  handlePlayerSelect(side);
+  savePrefs();
+}
+function getSelectedPlayer(side){
+  const players=getPlayers();
+  const id=document.getElementById(`p${side}Select`).value;
+  return players.find(p=>p.id===id) || players[0];
+}
+function loadPrefs(){
+  refreshPlayerDropdowns();
+  try{
+    const saved=JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');
+    if(saved.p1Id) document.getElementById('p1Select').value=saved.p1Id;
+    if(saved.p2Id) document.getElementById('p2Select').value=saved.p2Id;
+    if(saved.opponentType==='human') chooseHuman(); else chooseRiley();
+    if(saved.ghostLevel) document.getElementById('ghostLevel').value=saved.ghostLevel;
+  }catch(e){}
+  try{
+    const savedGame=JSON.parse(localStorage.getItem(GAME_KEY)||'null');
+    if(savedGame && savedGame.gameId) game=savedGame;
+  }catch(e){}
+}
+function savePrefs(){
+  localStorage.setItem(PREFS_KEY, JSON.stringify({
+    p1Id: document.getElementById('p1Select').value,
+    p2Id: document.getElementById('p2Select').value,
+    opponentType,
+    ghostLevel: document.getElementById('ghostLevel').value
+  }));
+}
+function saveGame(){
+  localStorage.setItem(GAME_KEY, JSON.stringify(game));
+  const stamp=new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'});
+  document.getElementById('saveStatus').textContent = game.isSubmitted ? `Submitted and locked at ${stamp}` : `Saved locally at ${stamp}`;
+}
+function chooseRiley(){ opponentType='riley'; document.getElementById('humanOpponentBox').style.display='none'; }
+function chooseHuman(){ opponentType='human'; document.getElementById('humanOpponentBox').style.display='block'; refreshPlayerDropdowns(); }
+
+function startGame(){
+  if(document.getElementById('p1Select').value==='__new'){ alert('Save Player 1 first.'); return; }
+  if(opponentType==='human' && document.getElementById('p2Select').value==='__new'){ alert('Save Player 2 first.'); return; }
+  savePrefs();
+  const p1=getSelectedPlayer(1);
+  const p2=opponentType==='human' ? getSelectedPlayer(2) : {id:'RILEY', name:'Riley 👻'};
+  game.p1Id=p1.id; game.p1Name=p1.name;
+  game.opponentType=opponentType;
+  game.ghostLevel=document.getElementById('ghostLevel').value;
+  game.mode=document.getElementById('mode').value;
+  game.p2Id=p2.id; game.p2Name=p2.name;
+  showGame();
+  saveGame();
+}
+function newGame(){
+  if(!confirm('Start a brand new game and clear the current active game?')) return;
+  const keep = {
+    p1Id: document.getElementById('p1Select').value,
+    p2Id: document.getElementById('p2Select').value,
+    opponentType,
+    ghostLevel: document.getElementById('ghostLevel').value
+  };
+  game=defaultGame();
+  document.getElementById('p1Select').value=keep.p1Id;
+  document.getElementById('p2Select').value=keep.p2Id;
+  opponentType=keep.opponentType;
+  document.getElementById('ghostLevel').value=keep.ghostLevel;
+  if(opponentType==='human') chooseHuman(); else chooseRiley();
+  startGame();
+}
+function showGame(){
+  document.getElementById('p1Name').textContent=game.p1Name;
+  document.getElementById('p2Name').textContent=game.p2Name;
+  document.getElementById('setupScreen').classList.remove('active');
+  document.getElementById('gameScreen').classList.add('active');
+  update();
+}
+function showSetup(){
+  refreshPlayerDropdowns();
+  if(game.p1Id) document.getElementById('p1Select').value=game.p1Id;
+  if(game.p2Id && game.p2Id !== 'RILEY') document.getElementById('p2Select').value=game.p2Id;
+  if(game.opponentType==='human') chooseHuman(); else chooseRiley();
+  document.getElementById('ghostLevel').value=game.ghostLevel || '6';
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('setupScreen').classList.add('active');
+}
+function addBag(points, icon){
+  if(game.isSubmitted){ alert('This game has already been submitted. Start a new game to keep playing.'); return; }
+  if(game.current.length>=4) return;
+  game.current.push(points); game.currentIcons.push(icon);
+  if(game.current.length===4) finishThrow();
+  saveGame(); update();
+}
+function undoBag(){
+  if(game.isSubmitted){ alert('This game has already been submitted. Start a new game to make changes.'); return; }
+  if(game.current.length===0) return;
+  game.current.pop(); game.currentIcons.pop();
+  saveGame(); update();
+}
+function finishThrow(){
+  if(game.inputSide===1){
+    const p1Bags=[...game.current];
+    const p1Icons=[...game.currentIcons];
+    if(game.opponentType==='riley'){
+      const g=ghostThrow();
+      addRound(p1Bags, g.arr, p1Icons, g.icons);
+      game.current=[]; game.currentIcons=[]; game.inputSide=1; game.p1Pending=[];
+    }else{
+      game.p1Pending=p1Bags;
+      game.p1PendingIcons=p1Icons;
+      game.current=[]; game.currentIcons=[]; game.inputSide=2;
+    }
+  }else{
+    addRound([...game.p1Pending], [...game.current], [...game.p1PendingIcons], [...game.currentIcons]);
+    game.current=[]; game.currentIcons=[]; game.inputSide=1; game.p1Pending=[]; game.p1PendingIcons=[];
+  }
+}
+function ghostThrow(){
+  const target=parseFloat(game.ghostLevel);
+  let pIn=Math.max(0.05, Math.min(0.78, target/12 - 0.08));
+  let pOn=Math.max(0.12, Math.min(0.55, (target - pIn*12)/4));
+  let arr=[], icons=[];
+  for(let i=0;i<4;i++){
+    let r=Math.random(), p=0, ic='❌';
+    if(r<pIn){p=3; ic='🕳️';}
+    else if(r<pIn+pOn){p=1; ic='🟨';}
+    arr.push(p); icons.push(ic);
+  }
+  return {arr,icons};
+}
+function iconsFromBags(bags){ return bags.map(p=>p===3?'🕳️':p===1?'🟨':'❌'); }
+function addRound(p1Bags,p2Bags,p1Icons,p2Icons){
+  const p1Pts=sum(p1Bags), p2Pts=sum(p2Bags), diff=p1Pts-p2Pts;
+  game.rounds.push({
+    roundNo: game.rounds.length+1,
+    p1Bags, p2Bags,
+    p1Icons: p1Icons || iconsFromBags(p1Bags),
+    p2Icons: p2Icons || iconsFromBags(p2Bags),
+    p1Pts, p2Pts,
+    scoreBy: diff>0 ? 1 : diff<0 ? 2 : 0,
+    scorePts: Math.abs(diff),
+    createdAt: new Date().toISOString()
+  });
+}
+function sum(arr){ return arr.reduce((a,b)=>a+b,0); }
+function calcStats(){
+  let p1Score=0,p2Score=0;
+  let p1={rounds:game.rounds.length,bags:0,pts:0,in:0,on:0,off:0};
+  let p2={rounds:game.rounds.length,bags:0,pts:0,in:0,on:0,off:0};
+  game.rounds.forEach(r=>{
+    const diff=r.p1Pts-r.p2Pts;
+    if(diff>0) p1Score+=diff;
+    if(diff<0) p2Score+=Math.abs(diff);
+    r.p1Bags.forEach(p=>countBag(p1,p));
+    r.p2Bags.forEach(p=>countBag(p2,p));
+  });
+  return {p1Score,p2Score,p1,p2};
+}
+function countBag(s,p){ s.bags++; s.pts+=p; if(p===3)s.in++; else if(p===1)s.on++; else s.off++; }
+function ppr(s){ return s.rounds ? (s.pts/s.rounds).toFixed(2) : '0.00'; }
+function update(){
+  const st=calcStats();
+  document.getElementById('p1Name').textContent=game.p1Name;
+  document.getElementById('p2Name').textContent=game.p2Name;
+  document.getElementById('gameIdLabel').textContent=`Game ${game.gameId}`;
+  document.getElementById('p1Score').textContent=st.p1Score;
+  document.getElementById('p2Score').textContent=st.p2Score;
+  document.getElementById('p1Ppr').textContent=ppr(st.p1);
+  document.getElementById('p2Ppr').textContent=ppr(st.p2);
+  document.getElementById('p1Rounds').textContent=st.p1.rounds;
+  document.getElementById('p2Rounds').textContent=st.p2.rounds;
+  document.getElementById('p1In').textContent=st.p1.in;
+  document.getElementById('p2In').textContent=st.p2.in;
+  document.getElementById('p1On').textContent=st.p1.on;
+  document.getElementById('p2On').textContent=st.p2.on;
+  const pendingEl=document.getElementById('pendingThrow');
+  if(game.inputSide===2 && game.p1PendingIcons && game.p1PendingIcons.length){
+    pendingEl.className='tiny pending-highlight';
+    pendingEl.textContent = `${game.p1Name} threw: ${game.p1PendingIcons.join(' ')}`;
+  }else{
+    pendingEl.className='tiny';
+    pendingEl.textContent = '';
+  }
+  document.getElementById('turnHelp').textContent = game.inputSide===1 ? `${game.p1Name} turn. Tap each bag result.` : `${game.p2Name} turn. Tap each bag result.`;
+  document.getElementById('currentBags').textContent = game.currentIcons.length ? game.currentIcons.join(' ') : '— — — —';
+  renderRounds();
+  const submitBtn=document.getElementById('submitBtn');
+  if(submitBtn){
+    submitBtn.disabled=!!game.isSubmitted;
+    submitBtn.textContent=game.isSubmitted ? 'Game Submitted / Locked' : 'Submit Final Game';
+  }
+}
+function renderRounds(){
+  const list=document.getElementById('roundList');
+  if(!game.rounds.length){ list.innerHTML='<div class="tiny">No completed rounds yet.</div>'; return; }
+  list.innerHTML=game.rounds.map((r,i)=>{
+    const diff=r.p1Pts-r.p2Pts;
+    const result=diff>0?`${game.p1Name} +${diff}`:diff<0?`${game.p2Name} +${Math.abs(diff)}`:'Wash';
+    return `<div class="round-item">
+      <div><b>Round ${i+1}</b> <small>${r.p1Pts}-${r.p2Pts} · ${result}</small><br>
+      <small>${game.p1Name}: ${r.p1Icons.join(' ')} | ${game.p2Name}: ${r.p2Icons.join(' ')}</small></div>
+      <button class="secondary" onclick="editRound(${i})">Edit</button>
+    </div>`;
+  }).join('');
+}
+function editRound(index){
+  if(game.isSubmitted){ alert('This game has already been submitted and is locked.'); return; }
+  const r=game.rounds[index];
+  const parse = (txt) => {
+    const vals = txt.split(',').map(x=>Number(x.trim())).filter(x=>[0,1,3].includes(x));
+    return vals.length===4 ? vals : null;
+  };
+  const p1txt=prompt(`Edit ${game.p1Name} bags for Round ${index+1}\nUse four numbers: 3=in, 1=on, 0=off`, r.p1Bags.join(','));
+  if(p1txt===null) return;
+  const p1=parse(p1txt);
+  if(!p1){ alert('Use exactly four values: 3, 1, or 0. Example: 3,1,0,3'); return; }
+  const p2txt=prompt(`Edit ${game.p2Name} bags for Round ${index+1}\nUse four numbers: 3=in, 1=on, 0=off`, r.p2Bags.join(','));
+  if(p2txt===null) return;
+  const p2=parse(p2txt);
+  if(!p2){ alert('Use exactly four values: 3, 1, or 0. Example: 3,1,0,3'); return; }
+  r.p1Bags=p1; r.p2Bags=p2; r.p1Icons=iconsFromBags(p1); r.p2Icons=iconsFromBags(p2);
+  r.p1Pts=sum(p1); r.p2Pts=sum(p2);
+  const diff=r.p1Pts-r.p2Pts;
+  r.scoreBy=diff>0?1:diff<0?2:0; r.scorePts=Math.abs(diff); r.editedAt=new Date().toISOString();
+  saveGame(); update();
+}
+function resetGame(){
+  if(game.isSubmitted){
+    if(confirm('This game has already been submitted. Start a brand new game instead?')) newGame();
+    return;
+  }
+  if(!confirm('Reset this active game?')) return;
+  const p1Name=game.p1Name, p2Name=game.p2Name, p1Id=game.p1Id, p2Id=game.p2Id, opp=game.opponentType, lvl=game.ghostLevel;
+  game=defaultGame();
+  game.p1Name=p1Name; game.p2Name=p2Name; game.p1Id=p1Id; game.p2Id=p2Id; game.opponentType=opp; game.ghostLevel=lvl;
+  saveGame(); update();
+}
+async function submitFinal(){
+  if(game.isSubmitted){
+    alert('This game was already submitted. Start a new game before submitting again.');
+    return;
+  }
+  if(!game.rounds.length){ alert('No completed rounds to submit yet.'); return; }
+  const st=calcStats();
+  const payload = {
+    ...game,
+    finalScoreP1: st.p1Score,
+    finalScoreP2: st.p2Score,
+    finalP1Stats: st.p1,
+    finalP2Stats: st.p2,
+    p1PPR: Number(ppr(st.p1)),
+    p2PPR: Number(ppr(st.p2)),
+    submittedAt: new Date().toISOString(),
+    isSubmitted: true
+  };
+
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true;
+  btn.textContent='Submitting...';
+
+  const submitted=JSON.parse(localStorage.getItem(SUBMITTED_KEY)||'[]');
+  if(!submitted.some(g => g.gameId === payload.gameId)){
+    submitted.push(payload);
+    localStorage.setItem(SUBMITTED_KEY, JSON.stringify(submitted));
+  }
+
+  try {
+    await fetch(SHEET_WEB_APP_URL, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+
+    game.submittedAt=payload.submittedAt;
+    game.isSubmitted=true;
+    saveGame();
+    update();
+
+    const startNew = confirm('Game submitted to Google Sheet. Start a brand new game now?');
+    if(startNew){
+      newGameAfterSubmit();
+    }else{
+      alert('Game is locked so it cannot be submitted twice.');
+    }
+  } catch(e) {
+    btn.disabled=false;
+    btn.textContent='Submit Final Game';
+    alert('Submit failed. The game is still saved locally and was not locked.');
+  }
 }
 
-function toggleMore(){
-  moreStats.classList.toggle("hidden");
+function newGameAfterSubmit(){
+  const keep = {
+    p1Id: game.p1Id,
+    p2Id: game.p2Id,
+    opponentType: game.opponentType,
+    ghostLevel: game.ghostLevel
+  };
+  game=defaultGame();
+  game.opponentType=keep.opponentType;
+  game.ghostLevel=keep.ghostLevel;
+  const players=getPlayers();
+  const p1=players.find(p=>p.id===keep.p1Id) || players[0];
+  const p2=keep.opponentType==='human'
+    ? (players.find(p=>p.id===keep.p2Id) || players[0])
+    : {id:'RILEY', name:'Riley 👻'};
+  game.p1Id=p1.id; game.p1Name=p1.name;
+  game.p2Id=p2.id; game.p2Name=p2.name;
+  saveGame();
+  showGame();
 }
 
-function escapeHtml(value){
-  return String(value??"")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+function openRemoteLink(){
+  const remoteUrl = `remote.html?gameId=${encodeURIComponent(game.gameId)}&player=P1`;
+  window.open(remoteUrl, '_blank');
 }
 
-render();
+loadPrefs();
+if(game && game.gameId){
+  refreshPlayerDropdowns();
+  if(game.p1Id) document.getElementById('p1Select').value=game.p1Id;
+  if(game.p2Id && game.p2Id !== 'RILEY') document.getElementById('p2Select').value=game.p2Id;
+  opponentType = game.opponentType || 'riley';
+  if(opponentType==='human') chooseHuman(); else chooseRiley();
+  document.getElementById('ghostLevel').value = game.ghostLevel || '6';
+}
 </script>
+
+<!-- === Play Riley Prototype === -->
+<div id="play-riley" style="margin:20px;padding:16px;border:2px solid #3a7;border-radius:10px">
+<h2>Play Riley (Prototype)</h2>
+<label>Game Mode:
+<select id="gameMode">
+<option>Free Practice</option>
+<option selected>Play Riley</option>
+</select></label>
+<label style="margin-left:20px">Skill:
+<select id="rileySkill">
+<option>Beginner</option><option>Casual</option><option selected>League</option>
+<option>Regional</option><option>Elite</option><option>World Class</option>
+</select></label>
+<hr>
+<div style="display:flex;gap:20px">
+<div><h3>Jeremy</h3><div>Score: <span id="js">0</span></div></div>
+<div><h3>🤖 Riley</h3><div>Score: <span id="rs">0</span></div></div>
+</div>
+<p>Enter your round (0-12): <input id="jr" type="number" min="0" max="12" style="width:60px">
+<button onclick="playRileyRound()">Submit</button></p>
+<p id="status"></p>
+</div>
+<script>
+let jScore=0,rScore=0;
+function playRileyRound(){
+ const v=parseInt(document.getElementById('jr').value||0);
+ jScore+=v;
+ document.getElementById('js').textContent=jScore;
+ document.getElementById('status').textContent='Riley is throwing...';
+ setTimeout(()=>{
+   const ai=Math.max(0,Math.min(12,Math.round(6+Math.random()*4)));
+   rScore+=ai;
+   document.getElementById('rs').textContent=rScore;
+   document.getElementById('status').textContent='Riley scored '+ai;
+   if(jScore>=21||rScore>=21){
+      alert((jScore>=21&&jScore>=rScore)?'Jeremy Wins!':'Riley Wins!');
+      jScore=0;rScore=0;
+      document.getElementById('js').textContent=0;
+      document.getElementById('rs').textContent=0;
+   }
+ },300);
+}
+</script>
+
 </body>
 </html>

@@ -43,7 +43,7 @@
         <div id="roundProgress" class="round-progress"></div>
       </div>
 
-      <div class="card score-entry">
+      <div class="card score-entry legacy-score-entry">
         <button class="bag-btn in" data-score="3" data-icon="🕳️">🕳️<span>IN</span></button>
         <button class="bag-btn on" data-score="1" data-icon="🟨">🟨<span>ON</span></button>
         <button class="bag-btn off" data-score="0" data-icon="❌">❌<span>OFF</span></button>
@@ -66,6 +66,18 @@
         <div id="roundList" class="round-list"></div>
       </div>
     </section>
+
+    <div id="roundEditor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="roundEditorTitle">
+      <div class="modal-card">
+        <h2 id="roundEditorTitle">Edit Round</h2>
+        <div id="roundEditorBody"></div>
+        <div class="modal-actions">
+          <button id="cancelRoundEdit" class="secondary">Cancel</button>
+          <button id="deleteRoundEdit" class="danger">Delete Round</button>
+          <button id="saveRoundEdit" class="primary">Save Changes</button>
+        </div>
+      </div>
+    </div>
 
     <div id="installHint" class="install-hint hidden">
       <strong>Install Tossed</strong>

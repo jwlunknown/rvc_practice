@@ -1,11 +1,12 @@
 import {getPlayers,savePlayers,loadGame,saveGame,clearGame,getPrefs,savePrefs,makeId} from './services/storage.js';
 import {ensureRemotePlayer,saveGameResults} from './services/supabase.js';
-import {newGame,addBag,undoBag,playerStats,teamScore} from './services/engine.js';
+import {newGame,addBag,undoBag,playerStats,teamScore,updateRoundThrow,deleteRound} from './services/engine.js';
 import {toggleFullscreen,installMessage} from './ui/fullscreen.js';
 
 const $=id=>document.getElementById(id);
 let selectedGame=getPrefs().selectedGame||'riley';
 let game=loadGame();
+let editingRound=null;
 const gameDefs=[
   {id:'riley',title:'Play Riley 👻',sub:'Singles practice'},
   {id:'singles',title:'1 vs 1',sub:'Two humans'},
@@ -54,22 +55,40 @@ function renderGame(){
   if(!game)return;const active=game.players[game.turn];
   $('gameLabel').textContent=`Game ${game.gameId}`;$('bagPreview').textContent=game.currentIcons.length?game.currentIcons.join(' '):'— — — —';
   $('pendingPreview').textContent=game.pending.map(x=>`${game.players[x.player].name}: ${x.icons.join(' ')}`).join(' | ');
-  $('turnText').textContent=`${active?.name||'Player'} turn. Tap each bag result.`;
+  $('turnText').textContent=`${active?.name||'Player'} turn. Tap that player's tile to score each bag.`;
   $('roundProgress').textContent=game.targetRounds?`Round ${Math.min(game.rounds.length+1,game.targetRounds)} of ${game.targetRounds}`:'';
   $('playerCards').innerHTML=game.teams.map((team,ti)=>playerCard(team,ti)).join('');
-  $('roundList').innerHTML=game.rounds.length?[...game.rounds].reverse().map(r=>`<div class="round-item"><div><b>Round ${r.roundNo}</b><div class="tiny">${r.throws.map(t=>`${esc(game.players[t.player].name)}: ${t.icons.join(' ')}`).join(' | ')}</div></div><button data-del="${r.roundNo-1}">Delete</button></div>`).join(''):'<div class="tiny">No completed rounds yet.</div>';
-  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(confirm('Delete this round?')){game.rounds.splice(Number(b.dataset.del),1);game.rounds.forEach((r,i)=>r.roundNo=i+1);saveGame(game);renderGame()}});
+  bindPlayerEntry();
+  $('roundList').innerHTML=renderRoundFrames();
+  bindRoundFrames();
   $('submitBtn').disabled=!game.rounds.length||game.submitted;
   $('submitBtn').textContent=game.submitted?'Game Submitted / Locked':'Submit Final Game';
 }
-function playerCard(team,ti){const members=team.map(i=>game.players[i].name).join(' + '),stats=team.map(i=>playerStats(game,i));const agg=stats.reduce((a,s)=>({rounds:Math.max(a.rounds,s.rounds),bags:a.bags+s.bags,pts:a.pts+s.pts,in:a.in+s.in,on:a.on+s.on,off:a.off+s.off}),{rounds:0,bags:0,pts:0,in:0,on:0,off:0});const ppr=agg.rounds?(agg.pts/agg.rounds).toFixed(2):'0.00',off=agg.bags?(agg.off/agg.bags*100).toFixed(1)+'%':'0.0%';return `<div class="card player-card team${ti+1}"><div class="player-head"><div class="player-name">${esc(members)}</div><div class="score">${teamScore(game,ti)}</div></div><div class="stats"><div class="stat"><b>${ppr}</b><small>PPR</small></div><div class="stat"><b>${agg.rounds}</b><small>RDS</small></div><div class="stat"><b>${agg.in}</b><small>IN</small></div><div class="stat"><b>${agg.on}</b><small>ON</small></div><div class="stat"><b>${off}</b><small>OFF%</small></div></div></div>`}
+function playerCard(team,ti){
+  const members=team.map(i=>game.players[i].name).join(' + '),stats=team.map(i=>playerStats(game,i));
+  const agg=stats.reduce((a,s)=>({rounds:Math.max(a.rounds,s.rounds),bags:a.bags+s.bags,pts:a.pts+s.pts,in:a.in+s.in,on:a.on+s.on,off:a.off+s.off}),{rounds:0,bags:0,pts:0,in:0,on:0,off:0});
+  const ppr=agg.rounds?(agg.pts/agg.rounds).toFixed(2):'0.00',off=agg.bags?(agg.off/agg.bags*100).toFixed(1)+'%':'0.0%';
+  const activePlayer=team.includes(game.turn)?game.turn:null;
+  const entry=activePlayer!==null&&!game.players[activePlayer].riley?`<div class="tile-entry" data-entry-player="${activePlayer}"><button data-entry-score="3">🕳️<small>IN</small></button><button data-entry-score="1">🟨<small>ON</small></button><button data-entry-score="0">❌<small>OFF</small></button><button data-entry-undo="1">↶<small>UNDO</small></button><div class="tile-running">Throw total: <b>${game.current.reduce((a,b)=>a+b,0)}</b> / 12</div></div>`:'';
+  return `<div class="card player-card team${ti+1} ${activePlayer!==null?'active-player':''}"><div class="player-head"><div class="player-name">${esc(members)}</div><div class="score">${teamScore(game,ti)}</div></div>${entry}<div class="stats"><div class="stat"><b>${ppr}</b><small>PPR</small></div><div class="stat"><b>${agg.rounds}</b><small>RDS</small></div><div class="stat"><b>${agg.in}</b><small>IN</small></div><div class="stat"><b>${agg.on}</b><small>ON</small></div><div class="stat"><b>${off}</b><small>OFF%</small></div></div></div>`
+}
+function bindPlayerEntry(){document.querySelectorAll('[data-entry-score]').forEach(b=>b.onclick=()=>scoreBag(Number(b.dataset.entryScore)));document.querySelectorAll('[data-entry-undo]').forEach(b=>b.onclick=()=>{if(game&&!game.submitted){undoBag(game);saveGame(game);renderGame()}})}
+function scoreBag(score){if(!game||game.submitted)return;if(game.targetRounds&&game.rounds.length>=game.targetRounds)return alert('Dime Bags is complete.');const icon=score===3?'🕳️':score===1?'🟨':'❌';addBag(game,score,icon);saveGame(game);renderGame()}
+function renderRoundFrames(){if(!game.rounds.length)return '<div class="tiny">No completed rounds yet.</div>';return `<div class="round-frames">${game.rounds.map((r,i)=>{const totals=r.throws.map(t=>t.bags.reduce((a,b)=>a+b,0));return `<button class="round-frame" data-round="${i}"><span class="frame-no">${r.roundNo}</span><span class="frame-score">${totals.join('–')}</span></button>`}).join('')}</div>`}
+function bindRoundFrames(){document.querySelectorAll('[data-round]').forEach(b=>b.onclick=()=>openRoundEditor(Number(b.dataset.round)))}
+function openRoundEditor(roundIndex){editingRound=roundIndex;const r=game.rounds[roundIndex];const html=r.throws.map(t=>`<div class="edit-throw"><strong>${esc(game.players[t.player].name)}</strong><div class="edit-bags">${t.bags.map((v,bi)=>`<select data-edit-player="${t.player}" data-edit-bag="${bi}"><option value="0" ${v===0?'selected':''}>OFF · 0</option><option value="1" ${v===1?'selected':''}>ON · 1</option><option value="3" ${v===3?'selected':''}>IN · 3</option></select>`).join('')}</div><div class="edit-total">Total: <b>${t.bags.reduce((a,b)=>a+b,0)}</b></div></div>`).join('');$('roundEditorTitle').textContent=`Edit Round ${r.roundNo}`;$('roundEditorBody').innerHTML=html;$('roundEditor').classList.remove('hidden');document.querySelectorAll('[data-edit-player]').forEach(s=>s.onchange=updateEditorTotals)}
+function updateEditorTotals(){document.querySelectorAll('.edit-throw').forEach(row=>{const total=[...row.querySelectorAll('select')].reduce((a,s)=>a+Number(s.value),0);row.querySelector('.edit-total b').textContent=total})}
+function saveRoundEdit(){const grouped={};document.querySelectorAll('[data-edit-player]').forEach(s=>{const p=Number(s.dataset.editPlayer);grouped[p]??=[];grouped[p][Number(s.dataset.editBag)]=Number(s.value)});Object.entries(grouped).forEach(([p,bags])=>updateRoundThrow(game,editingRound,Number(p),bags));saveGame(game);closeRoundEditor();renderGame()}
+function removeRound(){if(editingRound===null)return;if(confirm('Delete this round?')){deleteRound(game,editingRound);saveGame(game);closeRoundEditor();renderGame()}}
+function closeRoundEditor(){editingRound=null;$('roundEditor').classList.add('hidden')}
 async function submit(){try{$('submitBtn').disabled=true;$('submitBtn').textContent='Submitting…';await saveGameResults(game,playerStats);game.submitted=true;game.submittedAt=new Date().toISOString();saveGame(game);renderGame();alert('Game saved to Tossed.')}catch(e){$('submitBtn').disabled=false;$('submitBtn').textContent='Submit Final Game';alert('Still saved locally; Supabase submission failed: '+e.message)}}
 function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
 
 $('startBtn').onclick=start;$('resumeBtn').onclick=()=>game&&showGame();$('gamesBtn').onclick=showSetup;
 $('resetBtn').onclick=()=>{if(confirm('Reset this active game?')){clearGame();game=null;showSetup()}};
 $('submitBtn').onclick=submit;$('undoBtn').onclick=()=>{if(game){undoBag(game);saveGame(game);renderGame()}};
-document.querySelectorAll('[data-score]').forEach(b=>b.onclick=()=>{if(!game||game.submitted)return;if(game.targetRounds&&game.rounds.length>=game.targetRounds)return alert('Dime Bags is complete.');addBag(game,Number(b.dataset.score),b.dataset.icon);saveGame(game);renderGame()});
+document.querySelectorAll('[data-score]').forEach(b=>b.onclick=()=>scoreBag(Number(b.dataset.score)));
+$('saveRoundEdit').onclick=saveRoundEdit;$('deleteRoundEdit').onclick=removeRound;$('cancelRoundEdit').onclick=closeRoundEditor;
 $('fullscreenBtn').onclick=async()=>{const ok=await toggleFullscreen();if(!ok){$('installText').textContent=installMessage();$('installHint').classList.remove('hidden')}};
 $('dismissInstall').onclick=()=>$('installHint').classList.add('hidden');$('homeBtn').onclick=showSetup;
 document.addEventListener('fullscreenchange',()=>{$('fullscreenBtn').textContent=document.fullscreenElement?'✕':'⛶'});

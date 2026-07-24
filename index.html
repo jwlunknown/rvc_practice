@@ -20,63 +20,40 @@
     </header>
 
     <section id="setupScreen" class="screen active">
-      <div class="card">
-        <h2>Choose a game</h2>
-        <div class="game-grid" id="gameGrid"></div>
-      </div>
-      <div class="card join-card">
-        <h2>Join a linked game</h2>
-        <div class="join-row"><input id="joinCode" maxlength="6" autocomplete="off" placeholder="ROOM CODE"><button id="joinBtn" class="secondary">Join</button></div>
-        <div class="tiny">Scan a host's QR code or enter the six-character code.</div>
-      </div>
-      <div class="card" id="playerSetupCard">
-        <h2 id="setupTitle">Play Riley</h2>
-        <div id="setupFields"></div>
-        <button id="startBtn" class="primary full">Start Game</button>
-        <button id="resumeBtn" class="secondary full hidden">Resume Saved Game</button>
-      </div>
+      <div class="card"><h2>Choose a game</h2><div class="game-grid" id="gameGrid"></div></div>
+      <div class="card join-card"><h2>Join a linked game</h2><div class="join-row"><input id="joinCode" maxlength="6" autocomplete="off" placeholder="ROOM CODE"><button id="joinBtn" class="secondary">Join</button></div><div class="tiny">Scan a host's QR code or enter the six-character code.</div></div>
+      <div class="card" id="playerSetupCard"><h2 id="setupTitle">Play Riley</h2><div id="setupFields"></div><button id="startBtn" class="primary full">Start Game</button><button id="resumeBtn" class="secondary full hidden">Resume Saved Game</button></div>
     </section>
 
     <section id="gameScreen" class="screen">
       <div id="roomBar" class="room-bar hidden"><span>LINKED ROOM <b id="roomCodeLabel"></b></span><button id="shareRoomBtn">Share</button><button id="leaveRoomBtn">Leave</button></div>
-      <div class="card current-throw">
-        <div class="eyebrow">CURRENT THROW</div>
-        <div id="gameLabel" class="game-label"></div>
-        <div id="bagPreview" class="bag-preview">— — — —</div>
-        <div id="pendingPreview" class="tiny"></div>
-        <div id="turnText" class="turn-text"></div>
-        <div id="roundProgress" class="round-progress"></div>
+      <div class="game-main-grid">
+        <div class="game-primary">
+          <div class="card current-throw">
+            <div class="eyebrow">CURRENT THROW</div>
+            <div id="gameLabel" class="game-label"></div>
+            <div id="bagPreview" class="bag-preview">— — — —</div>
+            <div id="pendingPreview" class="tiny"></div>
+            <div id="turnText" class="turn-text"></div>
+            <div id="sideText" class="side-text"></div>
+            <div id="roundProgress" class="round-progress"></div>
+            <div id="recentFrame" class="recent-frame"></div>
+          </div>
+          <div class="card score-entry legacy-score-entry"><button class="bag-btn in" data-score="3">🕳️<span>IN</span></button><button class="bag-btn on" data-score="1">🟨<span>ON</span></button><button class="bag-btn off" data-score="0">❌<span>OFF</span></button><button id="undoBtn" class="bag-btn undo">↶<span>UNDO</span></button></div>
+          <div id="playerCards"></div>
+        </div>
+        <div class="game-secondary">
+          <div class="card"><h2>Rounds</h2><div id="roundList" class="round-list"></div></div>
+          <div class="card action-card"><button id="linkBtn" class="secondary full">Link Another Screen</button><div class="two-col"><button id="gamesBtn" class="secondary">Games / Players</button><button id="resetBtn" class="danger">Reset</button></div><button id="finishBtn" class="secondary full">Finish & View Recap</button><button id="submitBtn" class="primary full">Submit Final Game</button><div id="saveStatus" class="tiny">Auto-save ready.</div></div>
+        </div>
       </div>
-      <div class="card score-entry legacy-score-entry">
-        <button class="bag-btn in" data-score="3">🕳️<span>IN</span></button>
-        <button class="bag-btn on" data-score="1">🟨<span>ON</span></button>
-        <button class="bag-btn off" data-score="0">❌<span>OFF</span></button>
-        <button id="undoBtn" class="bag-btn undo">↶<span>UNDO</span></button>
-      </div>
-      <div id="playerCards"></div>
-      <div class="card action-card">
-        <button id="linkBtn" class="secondary full">Link Another Screen</button>
-        <div class="two-col"><button id="gamesBtn" class="secondary">Games / Players</button><button id="resetBtn" class="danger">Reset</button></div>
-        <button id="finishBtn" class="secondary full">Finish & View Recap</button>
-        <button id="submitBtn" class="primary full">Submit Final Game</button>
-        <div id="saveStatus" class="tiny">Auto-save ready.</div>
-      </div>
-      <div class="card"><h2>Rounds</h2><div id="roundList" class="round-list"></div></div>
     </section>
 
-    <section id="recapScreen" class="screen">
-      <div class="card recap-hero"><div class="eyebrow">GAME COMPLETE</div><h2 id="recapWinner"></h2><div id="recapScore" class="recap-score"></div></div>
-      <div id="recapPlayers"></div>
-      <div class="card"><h2>Round Summary</h2><div id="recapRounds" class="round-list"></div></div>
-      <div class="card"><button id="playAgainBtn" class="primary full">Play Again</button><button id="changePlayersBtn" class="secondary full">Change Players</button><button id="backGamesBtn" class="secondary full">Back to Games</button></div>
-    </section>
+    <section id="recapScreen" class="screen"><div class="card recap-hero"><div class="eyebrow">GAME COMPLETE</div><h2 id="recapWinner"></h2><div id="recapScore" class="recap-score"></div></div><div id="recapPlayers"></div><div class="card"><h2>Round Summary</h2><div id="recapRounds" class="round-list"></div></div><div class="card"><button id="playAgainBtn" class="primary full">Play Again</button><button id="changePlayersBtn" class="secondary full">Change Players</button><button id="backGamesBtn" class="secondary full">Back to Games</button></div></section>
 
-    <div id="roomModal" class="modal hidden" role="dialog" aria-modal="true">
-      <div class="modal-card room-modal-card"><h2 id="roomModalTitle">Linked Screen</h2><div id="roomModalBody"></div><button id="closeRoomModal" class="secondary full">Close</button></div>
-    </div>
-    <div id="roundEditor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="roundEditorTitle">
-      <div class="modal-card"><h2 id="roundEditorTitle">Edit Round</h2><div id="roundEditorBody"></div><div class="modal-actions"><button id="cancelRoundEdit" class="secondary">Cancel</button><button id="deleteRoundEdit" class="danger">Delete Round</button><button id="saveRoundEdit" class="primary">Save Changes</button></div></div>
-    </div>
+    <div id="scoreFlash" class="score-flash hidden" aria-live="polite"><div id="scoreFlashName"></div><strong id="scoreFlashScore"></strong><span id="scoreFlashDetail"></span></div>
+    <div id="roomModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card room-modal-card"><h2 id="roomModalTitle">Linked Screen</h2><div id="roomModalBody"></div><button id="closeRoomModal" class="secondary full">Close</button></div></div>
+    <div id="roundEditor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="roundEditorTitle"><div class="modal-card"><h2 id="roundEditorTitle">Edit Round</h2><div id="roundEditorBody"></div><div class="modal-actions"><button id="cancelRoundEdit" class="secondary">Cancel</button><button id="deleteRoundEdit" class="danger">Delete Round</button><button id="saveRoundEdit" class="primary">Save Changes</button></div></div></div>
     <div id="installHint" class="install-hint hidden"><strong>Install Tossed</strong><span id="installText"></span><button id="dismissInstall" class="text-btn">Dismiss</button></div>
   </main>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

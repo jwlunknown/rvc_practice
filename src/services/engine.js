@@ -45,7 +45,10 @@ function finishThrow(game){
   game.current=[];game.currentIcons=[];advance(game);
 }
 function currentRoundStarter(game){
-  game.roundStarter??=game.startPlayer??0;
+  if(game.roundStarter==null){
+    if(game.rounds?.length)recomputeRoundStarters(game);
+    else game.roundStarter=game.startPlayer??0;
+  }
   return game.roundStarter;
 }
 function orderedPlayers(game){return Array.from({length:game.players.length},(_,n)=>(currentRoundStarter(game)+n)%game.players.length)}

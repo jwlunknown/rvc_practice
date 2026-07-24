@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Tossed">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./side-card.css">
   <title>TOSSED | Rogue Valley Cornhole</title>
 </head>
 <body>
@@ -48,13 +49,14 @@
 
         <div class="widget" data-widget="rounds"><div class="card"><h2>Rounds</h2><div id="roundList" class="round-list"></div></div></div>
 
-        <div class="widget" data-widget="actions"><div class="card action-card"><button id="linkBtn" class="secondary full">Link Another Screen</button><div class="two-col"><button id="gamesBtn" class="secondary">Games / Players</button><button id="resetBtn" class="danger">Reset</button></div><button id="finishBtn" class="secondary full">Finish & View Recap</button><button id="submitBtn" class="primary full">Submit Final Game</button><div id="saveStatus" class="tiny">Auto-save ready.</div></div></div>
+        <div class="widget" data-widget="actions"><div class="card action-card"><button id="gameSettingsBtn" class="secondary full">Update Game Settings</button><button id="linkBtn" class="secondary full">Link Another Screen</button><div class="two-col"><button id="gamesBtn" class="secondary">Games / Players</button><button id="resetBtn" class="danger">Reset</button></div><button id="finishBtn" class="secondary full">Finish & View Recap</button><button id="submitBtn" class="primary full">Submit Final Game</button><div id="saveStatus" class="tiny">Auto-save ready.</div></div></div>
       </div>
     </section>
 
     <section id="recapScreen" class="screen"><div class="card recap-hero"><div class="eyebrow">GAME COMPLETE</div><h2 id="recapWinner"></h2><div id="recapScore" class="recap-score"></div></div><div id="recapPlayers"></div><div class="card"><h2>Round Summary</h2><div id="recapRounds" class="round-list"></div></div><div class="card"><button id="playAgainBtn" class="primary full">Play Again</button><button id="changePlayersBtn" class="secondary full">Change Players</button><button id="backGamesBtn" class="secondary full">Back to Games</button></div></section>
 
     <div id="scoreFlash" class="score-flash hidden" aria-live="polite"><div id="scoreFlashName"></div><strong id="scoreFlashScore"></strong><span id="scoreFlashDetail"></span></div>
+    <div id="gameSettingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="gameSettingsTitle"><div class="modal-card"><h2 id="gameSettingsTitle">Update Game Settings</h2><p class="tiny">Set where each player is standing for the current round. Tossed will automatically swap Inside and Outside after every completed round.</p><div id="gameSettingsBody"></div><div class="modal-actions"><button id="cancelGameSettings" class="secondary">Cancel</button><button id="saveGameSettings" class="primary">Save Settings</button></div></div></div>
     <div id="layoutModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="layoutModalTitle"><div class="modal-card layout-modal-card"><h2 id="layoutModalTitle">Customize Layout</h2><div class="layout-orientation"><button id="portraitLayoutBtn" class="secondary">Portrait</button><button id="landscapeLayoutBtn" class="secondary">Landscape</button></div><p class="tiny">Drag widgets to reorder on desktop, or use the arrow buttons. Size and visibility are saved separately for portrait and landscape.</p><div id="layoutEditorList" class="layout-editor-list"></div><div class="modal-actions"><button id="resetLayoutBtn" class="danger">Reset This Layout</button><button id="closeLayoutBtn" class="primary">Done</button></div></div></div>
     <div id="roomModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card room-modal-card"><h2 id="roomModalTitle">Linked Screen</h2><div id="roomModalBody"></div><button id="closeRoomModal" class="secondary full">Close</button></div></div>
     <div id="roundEditor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="roundEditorTitle"><div class="modal-card"><h2 id="roundEditorTitle">Edit Round</h2><div id="roundEditorBody"></div><div class="modal-actions"><button id="cancelRoundEdit" class="secondary">Cancel</button><button id="deleteRoundEdit" class="danger">Delete Round</button><button id="saveRoundEdit" class="primary">Save Changes</button></div></div></div>
@@ -64,5 +66,6 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
   <script type="module" src="./src/app.js"></script>
   <script type="module" src="./src/ui/layout.js"></script>
+  <script type="module" src="./src/ui/side-card.js"></script>
 </body>
 </html>

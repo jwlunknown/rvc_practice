@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Rogue Valley Cornhole digital tools: Tossed practice scoring and the RVC Bag Lab physics calculator.">
+  <meta name="theme-color" content="#1d3527">
+  <title>RVC Tools | Rogue Valley Cornhole</title>
+  <style>
+    :root{--orange:#D96A1B;--orange-dark:#A94A13;--forest:#31513A;--forest-dark:#1D3527;--ink:#F5E9D2;--muted:#D9C29C;--gold:#D9B56B;--card:#243B2B;--bg:#0B0F0C}
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:linear-gradient(180deg,#111 0%,var(--forest-dark) 52%,var(--bg) 100%);color:var(--ink)}
+    body{display:grid;place-items:center;padding:28px 16px}.wrap{width:min(100%,920px)}
+    header{text-align:center;margin-bottom:24px}h1{margin:0;font-size:clamp(2.2rem,7vw,4.8rem);letter-spacing:.05em}.tag{color:var(--muted);font-size:clamp(1rem,2vw,1.25rem);margin-top:8px}.intro{max-width:680px;margin:14px auto 0;color:var(--muted);line-height:1.55}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.card{display:flex;flex-direction:column;min-height:310px;padding:28px;border:1px solid rgba(255,255,255,.1);border-radius:24px;background:linear-gradient(180deg,var(--card),#18271E);box-shadow:0 18px 50px rgba(0,0,0,.35);text-decoration:none;color:var(--ink);transition:transform .16s ease,border-color .16s ease}.card:hover{transform:translateY(-4px);border-color:var(--gold)}
+    .eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.14em;color:var(--gold);font-weight:800}.card h2{font-size:clamp(2rem,5vw,3.3rem);margin:8px 0 10px}.card p{color:var(--muted);line-height:1.5;margin:0 0 24px}.button{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;border-radius:16px;padding:14px 18px;font-weight:900;background:linear-gradient(135deg,var(--orange),var(--orange-dark));color:#fff}.baglab .button{background:linear-gradient(135deg,var(--gold),#a97b23);color:#1a1302}
+    footer{text-align:center;margin-top:22px;color:var(--muted);font-size:.88rem}footer a{color:var(--gold)}
+    @media(max-width:680px){.grid{grid-template-columns:1fr}.card{min-height:260px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1>RVC TOOLS</h1>
+      <div class="tag">Rogue Valley Cornhole</div>
+      <p class="intro">Practice against Riley, track a game, or explore the physics hiding inside every bag you throw.</p>
+    </header>
+    <section class="grid" aria-label="Rogue Valley Cornhole tools">
+      <a class="card" href="./">
+        <div class="eyebrow">Practice & scoring</div>
+        <h2>TOSSED</h2>
+        <p>Play Riley, score rounds, track your game, and sharpen your throw when nobody else is standing across the court.</p>
+        <span class="button">Practice with Riley →</span>
+      </a>
+      <a class="card baglab" href="./calculator/">
+        <div class="eyebrow">Physics & exploration</div>
+        <h2>RVC BAG LAB</h2>
+        <p>Model release position, trajectory, speed, wind, air density, and landing geometry across a regulation court.</p>
+        <span class="button">Open the Bag Lab →</span>
+      </a>
+    </section>
+    <footer><a href="https://www.roguevalleycornhole.com/">← Back to Rogue Valley Cornhole</a></footer>
+  </main>
+</body>
+</html>

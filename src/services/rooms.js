@@ -35,6 +35,23 @@ export async function loadRoom(code){
   return data;
 }
 
+export async function discoverRooms(minutes=15){
+  if(!db) throw new Error('Room discovery is not available.');
+  const since=new Date(Date.now()-Math.max(1,minutes)*60_000).toISOString();
+  const {data,error}=await db.from('live_rooms')
+    .select('room_code,game_state,status,updated_at')
+    .eq('status','active')
+    .gte('updated_at',since)
+    .order('updated_at',{ascending:false})
+    .limit(12);
+  if(error) throw new Error('Could not check available rooms.');
+  return (data||[]).map(room=>({
+    code:room.room_code,
+    gameType:room.game_state?.type||'game',
+    updatedAt:room.updated_at
+  }));
+}
+
 export async function updateRoom(code,game,status='active'){
   if(!db||!code||suppress) return;
   const {error}=await db.from('live_rooms').update({game_state:game,status,updated_at:new Date().toISOString()}).eq('room_code',code);

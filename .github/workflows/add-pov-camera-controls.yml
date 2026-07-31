@@ -1,5 +1,6 @@
 name: Add POV camera controls
 
+# Existing-workflow trigger: apply the camera and trajectory guide patch.
 on:
   push:
     branches:
@@ -18,7 +19,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      - name: Add camera controls
+      - name: Add camera controls and trajectory guides
         shell: bash
         run: |
           python3 - <<'PY'
@@ -43,6 +44,12 @@ jobs:
                   raise SystemExit('POV camera projection block was not found')
               app = app.replace(old_camera, new_camera, 1)
 
+              old_path = "ctx.strokeStyle=color('--accent');ctx.lineWidth=4;ctx.globalAlpha=.88;ctx.stroke();ctx.globalAlpha=1;const release="
+              new_path = "ctx.strokeStyle=color('--accent');ctx.lineWidth=4;ctx.globalAlpha=.88;ctx.stroke();ctx.globalAlpha=1;for(let i=0;i<=8;i++){const q=project(sampleAt(s.T*i/8,s));if(!q)continue;ctx.fillStyle=color('--accent-4');ctx.beginPath();ctx.arc(q.x,q.y,i===0||i===8?4.5:3.2,0,Math.PI*2);ctx.fill()}const apexGuide=project(s.apex);if(apexGuide){ctx.fillStyle=color('--danger');ctx.beginPath();ctx.arc(apexGuide.x,apexGuide.y,5,0,Math.PI*2);ctx.fill();ctx.font='12px system-ui';ctx.fillText('apex',apexGuide.x+8,apexGuide.y-8)}const release="
+              if old_path not in app:
+                  raise SystemExit('POV trajectory drawing block was not found')
+              app = app.replace(old_path, new_path, 1)
+
               app += r'''
 
 function setupPovCameraControls(){
@@ -60,6 +67,8 @@ function setupPovCameraControls(){
       <button id="resetPovCamera" class="action-button" type="button">Reset camera</button>
     </div>`;
   view.insertBefore(panel,canvas);
+  const foot=view.querySelector('.view-foot');
+  if(foot)foot.textContent='The world-space path uses quadratic gravity, but player-view perspective can visually compress the parabola. Time dots and the apex marker reveal the actual curve. Vertical aerodynamic drag, lift, spin, and flutter are not modeled.';
 
   const zoom=$('povZoom'),yaw=$('povYaw'),pitch=$('povPitch');
   function syncPovCameraControls(){
@@ -69,7 +78,6 @@ function setupPovCameraControls(){
     $('povPitchValue').textContent=`${Math.round(povPitch)}°`;
     if(current)renderPov(current,currentFraction);
   }
-  window.syncPovCameraControls=syncPovCameraControls;
   zoom.addEventListener('input',()=>{povZoom=+zoom.value;syncPovCameraControls()});
   yaw.addEventListener('input',()=>{povYaw=+yaw.value;syncPovCameraControls()});
   pitch.addEventListener('input',()=>{povPitch=+pitch.value;syncPovCameraControls()});

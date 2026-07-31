@@ -22,7 +22,7 @@
 
     <section id="setupScreen" class="screen active">
       <div class="card"><h2>Choose a game</h2><div class="game-grid" id="gameGrid"></div></div>
-      <div class="card join-card"><h2>Join a linked game</h2><div class="join-row"><input id="joinCode" maxlength="6" autocomplete="off" placeholder="ROOM CODE"><button id="joinBtn" class="secondary">Join</button></div><div class="tiny">Scan a host's QR code or enter the six-character code.</div></div>
+      <div class="card join-card"><h2>Join a linked game</h2><div class="join-row"><input id="joinCode" maxlength="6" autocomplete="off" placeholder="ROOM CODE"><button id="joinBtn" class="secondary">Join</button></div><div class="nearby-heading"><strong>Available Tossed rooms</strong><button id="refreshRoomsBtn" class="text-btn">Refresh</button></div><div id="nearbyRooms" class="nearby-rooms"><div class="tiny">Checking for active rooms…</div></div><div class="tiny nearby-note">Rooms active in the last 15 minutes appear here. Room code and QR joining always remain available.</div></div>
       <div class="card" id="playerSetupCard"><h2 id="setupTitle">Play Riley</h2><div id="setupFields"></div><button id="startBtn" class="primary full">Start Game</button><button id="resumeBtn" class="secondary full hidden">Resume Saved Game</button></div>
     </section>
 
@@ -35,7 +35,7 @@
           <div class="card current-throw">
             <div class="eyebrow">CURRENT THROW</div>
             <div id="gameLabel" class="game-label"></div>
-            <div id="bagPreview" class="bag-preview">— — — —</div>
+            <div id="bagPreview" class="bag-preview" aria-live="off"><span>—</span><span>—</span><span>—</span><span>—</span></div>
             <div id="pendingPreview" class="tiny"></div>
             <div id="turnText" class="turn-text"></div>
             <div id="sideText" class="side-text"></div>
@@ -57,7 +57,7 @@
 
     <div id="scoreFlash" class="score-flash hidden" aria-live="polite"><div id="scoreFlashName"></div><strong id="scoreFlashScore"></strong><span id="scoreFlashDetail"></span></div>
     <div id="gameSettingsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="gameSettingsTitle"><div class="modal-card"><h2 id="gameSettingsTitle">Update Game Settings</h2><p class="tiny">Set where each player is standing for the current round. Tossed will automatically swap Inside and Outside after every completed round.</p><div id="gameSettingsBody"></div><div class="modal-actions"><button id="cancelGameSettings" class="secondary">Cancel</button><button id="saveGameSettings" class="primary">Save Settings</button></div></div></div>
-    <div id="layoutModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="layoutModalTitle"><div class="modal-card layout-modal-card"><h2 id="layoutModalTitle">Customize Layout</h2><div class="layout-orientation"><button id="portraitLayoutBtn" class="secondary">Portrait</button><button id="landscapeLayoutBtn" class="secondary">Landscape</button></div><p class="tiny">Drag widgets to reorder on desktop, or use the arrow buttons. Size and visibility are saved separately for portrait and landscape.</p><div id="layoutEditorList" class="layout-editor-list"></div><div class="modal-actions"><button id="resetLayoutBtn" class="danger">Reset This Layout</button><button id="closeLayoutBtn" class="primary">Done</button></div></div></div>
+    <div id="layoutModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="layoutModalTitle"><div class="modal-card layout-modal-card"><h2 id="layoutModalTitle">Customize Global Layout</h2><p class="layout-scope-note">GLOBAL DEFAULT · ALL GAME MODES</p><div class="layout-orientation"><button id="portraitLayoutBtn" class="secondary">Portrait</button><button id="landscapeLayoutBtn" class="secondary">Landscape</button></div><label class="layout-columns-control">Dashboard columns<input id="layoutColumns" type="number" min="1" max="6" step="1"></label><p class="tiny">Choose 1–6 columns, then set each tile’s width in columns and its minimum height. Drag to reorder or use the arrows. These defaults apply to every current and future game mode; individual games do not override them.</p><div id="layoutEditorList" class="layout-editor-list"></div><div class="modal-actions"><button id="resetLayoutBtn" class="danger">Reset Global Layout</button><button id="closeLayoutBtn" class="primary">Done</button></div></div></div>
     <div id="roomModal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card room-modal-card"><h2 id="roomModalTitle">Linked Screen</h2><div id="roomModalBody"></div><button id="closeRoomModal" class="secondary full">Close</button></div></div>
     <div id="roundEditor" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="roundEditorTitle"><div class="modal-card"><h2 id="roundEditorTitle">Edit Round</h2><div id="roundEditorBody"></div><div class="modal-actions"><button id="cancelRoundEdit" class="secondary">Cancel</button><button id="deleteRoundEdit" class="danger">Delete Round</button><button id="saveRoundEdit" class="primary">Save Changes</button></div></div></div>
     <div id="installHint" class="install-hint hidden"><strong>Install Tossed</strong><span id="installText"></span><button id="dismissInstall" class="text-btn">Dismiss</button></div>

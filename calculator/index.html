@@ -1,58 +1,140 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Interactive cornhole throw physics calculator from Rogue Valley Cornhole. Explore release position, trajectory, wind, speed, and landing geometry."><meta name="theme-color" content="#17313b">
-<title>RVC Bag Lab | Rogue Valley Cornhole</title>
-<link rel="stylesheet" href="styles.css"></head><body>
-<main class="app">
-<header class="hero"><div><h1>RVC Bag Lab</h1><p class="subtitle">One throw, three synchronized projections: top-down X–Z court geometry, side-view X–Y trajectory, and end-view Z–Y lateral/vertical motion. Explore how release position, height, timing, aim, air density, and wind shape a cornhole bag’s flight from your hand to the board.</p></div><div class="badge">Rogue Valley Cornhole · Experimental Throw Lab</div></header>
-<section class="metrics" aria-label="Calculated throw metrics">
-<article class="metric"><div class="metric-label">Throw distance X</div><div class="metric-value" id="metricX">28.25 ft</div><div class="metric-note">release point to impact</div></article>
-<article class="metric"><div class="metric-label">Initial X speed</div><div class="metric-value" id="metricVx0">23.2 ft/s</div><div class="metric-note">forward component</div></article>
-<article class="metric"><div class="metric-label">X speed at impact</div><div class="metric-value" id="metricVx1">21.7 ft/s</div><div class="metric-note">after modeled drag / wind</div></article>
-<article class="metric"><div class="metric-label">Peak height</div><div class="metric-value" id="metricPeak">7.0 ft</div><div class="metric-note">apex above ground</div></article>
-<article class="metric"><div class="metric-label">Launch angle</div><div class="metric-value" id="metricLaunch">34.0°</div><div class="metric-note">above horizontal plane</div></article>
-<article class="metric"><div class="metric-label">Lateral aim</div><div class="metric-value" id="metricAzimuth">0.0°</div><div class="metric-note">left/right horizontal angle</div></article>
-</section>
-<div class="layout">
-<section class="workspace">
-<div class="toolbar"><div class="view-buttons"><button class="view-button active" data-view="all" type="button">All views</button><button class="view-button" data-view="top" type="button">Top X–Z</button><button class="view-button" data-view="side" type="button">Side X–Y</button><button class="view-button" data-view="end" type="button">End Z–Y</button></div>
-<div class="play-controls"><button id="playButton" class="action-button primary" type="button">▶ Animate</button><button id="resetButton" class="action-button" type="button">Reset</button><div class="scrubber-wrap"><input id="timeScrubber" type="range" min="0" max="1" step="0.001" value="0"><span id="timeReadout">0.00 s</span></div></div></div>
-<div id="views" class="views">
-<article class="view top selected" data-panel="top"><div class="view-head"><div class="view-title">Top view: X–Z</div><div class="view-desc">Forward distance and inside/outside alignment</div></div>
-<svg id="topSvg" viewBox="0 0 1000 430"><defs><linearGradient id="topGrad" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--accent-4)"/><stop offset="50%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent-3)"/></linearGradient></defs><rect width="1000" height="430" rx="18" fill="var(--grass)"/><rect x="40" y="45" width="920" height="340" rx="14" fill="var(--court)" opacity=".85"/><line x1="60" y1="215" x2="940" y2="215" stroke="var(--grid)" stroke-width="2" stroke-dasharray="8 8"/><g id="topBoxes"></g><g id="topBoards"></g><g id="topGrid"></g><path id="topPathGlow" fill="none" stroke="url(#topGrad)" stroke-width="12" opacity=".20" stroke-linecap="round"/><path id="topPath" fill="none" stroke="url(#topGrad)" stroke-width="6" stroke-linecap="round"/><path id="topCenterReference" fill="none" stroke="var(--accent-2)" stroke-width="2" stroke-dasharray="8 7" opacity=".65"/><circle id="topRelease" r="8" fill="var(--accent-4)" stroke="var(--panel)" stroke-width="3"/><circle id="topImpact" r="8" fill="var(--accent-3)" stroke="var(--panel)" stroke-width="3"/><circle id="topBag" r="10" fill="var(--accent)" stroke="var(--panel)" stroke-width="3"/><text id="topReleaseText" class="main-label">release</text><text id="topImpactText" class="main-label">impact</text><text x="500" y="414" text-anchor="middle" class="axis-label">X → forward travel</text><text x="20" y="215" text-anchor="middle" class="axis-label" transform="rotate(-90 20 215)">Z → left / right</text></svg></article>
-<article class="view end selected" data-panel="end"><div class="view-head"><div class="view-title">End view: Z–Y</div><div class="view-desc">Looking downcourt toward the target board</div></div>
-<svg id="endSvg" viewBox="0 0 680 430"><defs><linearGradient id="endGrad" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--accent-4)"/><stop offset="50%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent-3)"/></linearGradient></defs><rect width="680" height="430" rx="18" fill="var(--panel-2)"/><g id="endGrid"></g><line x1="60" y1="375" x2="640" y2="375" stroke="var(--text)" stroke-width="3"/><line x1="340" y1="25" x2="340" y2="390" stroke="var(--grid)" stroke-width="2" stroke-dasharray="7 7"/><g id="endBoard"></g><path id="endPathGlow" fill="none" stroke="url(#endGrad)" stroke-width="12" opacity=".20" stroke-linecap="round"/><path id="endPath" fill="none" stroke="url(#endGrad)" stroke-width="6" stroke-linecap="round"/><circle id="endRelease" r="8" fill="var(--accent-4)" stroke="var(--panel)" stroke-width="3"/><circle id="endImpact" r="8" fill="var(--accent-3)" stroke="var(--panel)" stroke-width="3"/><circle id="endBag" r="10" fill="var(--accent)" stroke="var(--panel)" stroke-width="3"/><text x="340" y="415" text-anchor="middle" class="axis-label">Z → lateral position</text><text x="18" y="215" text-anchor="middle" class="axis-label" transform="rotate(-90 18 215)">Y → height</text></svg></article>
-<article class="view side selected" data-panel="side"><div class="view-head"><div class="view-title">Side view: X–Y</div><div class="view-desc">The parabolic arc and changing velocity components</div></div>
-<svg id="sideSvg" viewBox="0 0 1000 500"><defs><linearGradient id="sideGrad" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--accent-4)"/><stop offset="55%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent-3)"/></linearGradient></defs><rect width="1000" height="500" rx="18" fill="var(--panel-2)"/><g id="sideGrid"></g><line x1="65" y1="435" x2="955" y2="435" stroke="var(--text)" stroke-width="3"/><line x1="65" y1="435" x2="65" y2="35" stroke="var(--text)" stroke-width="3"/><g id="sideBoard"></g><path id="sideIdealPath" fill="none" stroke="var(--accent-2)" stroke-width="3" stroke-dasharray="9 7" opacity=".75"/><path id="sidePathGlow" fill="none" stroke="url(#sideGrad)" stroke-width="12" opacity=".20" stroke-linecap="round"/><path id="sidePath" fill="none" stroke="url(#sideGrad)" stroke-width="6" stroke-linecap="round"/><circle id="sideRelease" r="8" fill="var(--accent-4)" stroke="var(--panel)" stroke-width="3"/><circle id="sideImpact" r="8" fill="var(--accent-3)" stroke="var(--panel)" stroke-width="3"/><circle id="sideApex" r="7" fill="var(--danger)" stroke="var(--panel)" stroke-width="3"/><circle id="sideBag" r="10" fill="var(--accent)" stroke="var(--panel)" stroke-width="3"/><g id="velocityArrows"></g><text x="510" y="482" text-anchor="middle" class="axis-label">X → forward distance</text><text x="20" y="245" text-anchor="middle" class="axis-label" transform="rotate(-90 20 245)">Y → height</text></svg></article>
-</div></section>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Interactive cornhole throw physics calculator from Rogue Valley Cornhole. Explore release position, trajectory, wind, speed, and landing geometry.">
+  <meta name="theme-color" content="#17313b">
+  <title>RVC Bag Lab | Rogue Valley Cornhole</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<main id="app" class="app" data-display-mode="both">
+  <header class="hero">
+    <div>
+      <h1>RVC Bag Lab</h1>
+      <p class="subtitle">One throw, four synchronized views: top-down court geometry, side and end projections, plus a basic player-eye perspective for seeing the release, aim line, and flight path more like a real throw.</p>
+    </div>
+    <div class="badge">Rogue Valley Cornhole · Experimental Throw Lab</div>
+  </header>
 
-<aside class="controls">
-<section><div class="section-title">Throw geometry</div>
-<div class="control-row"><label class="control-label" for="throwSide"><span>Pitcher’s box side</span></label><select id="throwSide"><option value="1">Right side of board</option><option value="-1">Left side of board</option></select></div>
-<div class="control-row"><label class="control-label" for="boxPosition"><span>Position: inside → outside</span><span id="boxPositionValue" class="control-value">1.50 ft</span></label><input id="boxPosition" type="range" min="0" max="3" step="0.05" value="1.5"><div class="hint">0 = inside edge; 3 ft = outside edge of the 3-ft-wide box.</div></div>
-<div class="control-row"><label class="control-label" for="handReach"><span>Hand past foul line</span><span id="handReachValue" class="control-value">1.50 ft</span></label><input id="handReach" type="range" min="-2" max="3" step="0.05" value="1.5"><div class="hint">Negative values place the release behind the foul line; positive values place it beyond the line.</div></div>
-<div class="control-row"><label class="control-label" for="releaseHeight"><span>Release height Y</span><span id="releaseHeightValue" class="control-value">4.20 ft</span></label><input id="releaseHeight" type="range" min="2.5" max="6.5" step="0.05" value="4.2"></div></section>
+  <div class="display-switch" aria-label="Display preference">
+    <span>Display</span>
+    <button class="mode-button active" data-mode="both" type="button">Visual + numbers</button>
+    <button class="mode-button" data-mode="visual" type="button">Visual only</button>
+    <button class="mode-button" data-mode="numbers" type="button">Numbers only</button>
+  </div>
 
-<section class="control-group"><div class="section-title">Aim and timing</div>
-<div class="control-row"><label class="control-label" for="targetDepth"><span>Landing depth on board</span><span id="targetDepthValue" class="control-value">2.75 ft</span></label><input id="targetDepth" type="range" min="0" max="4" step="0.05" value="2.75"><div class="hint">Measured from the board’s front edge. Hole center is 3.25 ft.</div></div>
-<div class="control-row"><label class="control-label" for="targetZ"><span>Target Z on board</span><span id="targetZValue" class="control-value">0.00 ft</span></label><input id="targetZ" type="range" min="-1" max="1" step="0.025" value="0"><div class="hint">−1 ft = left edge; 0 = centerline; +1 ft = right edge.</div></div>
-<div class="control-row"><label class="control-label" for="flightTime"><span>Flight time</span><span id="flightTimeValue" class="control-value">1.25 s</span></label><input id="flightTime" type="range" min="0.75" max="1.8" step="0.01" value="1.25"></div></section>
+  <section class="metrics" aria-label="Calculated throw metrics">
+    <article class="metric"><div class="metric-label">Throw distance</div><div class="metric-value" id="metricX">28.25 ft</div><div class="metric-note">release to impact</div></article>
+    <article class="metric"><div class="metric-label">Launch speed</div><div class="metric-value" id="metricLaunchSpeed">0.0 mph</div><div class="metric-note">total velocity</div></article>
+    <article class="metric"><div class="metric-label">Impact speed</div><div class="metric-value" id="metricImpactSpeed">0.0 mph</div><div class="metric-note">at board contact</div></article>
+    <article class="metric"><div class="metric-label">Peak height</div><div class="metric-value" id="metricPeak">7.0 ft</div><div class="metric-note">above ground</div></article>
+    <article class="metric"><div class="metric-label">Launch angle</div><div class="metric-value" id="metricLaunch">34.0°</div><div class="metric-note">above horizontal</div></article>
+    <article class="metric"><div class="metric-label">Lateral aim</div><div class="metric-value" id="metricAzimuth">0.0°</div><div class="metric-note">left/right angle</div></article>
+    <article class="metric"><div class="metric-label">Flight time</div><div class="metric-value" id="metricTime">1.25 s</div><div class="metric-note">release to board</div></article>
+    <article class="metric"><div class="metric-label">Impact angle</div><div class="metric-value" id="metricImpactAngle">0.0°</div><div class="metric-note">down toward board</div></article>
+  </section>
 
-<section class="control-group"><div class="section-title">Air drag and wind</div>
-<div class="control-row"><label class="control-label" for="dragCalibration"><span>Drag calibration</span><span id="dragCalibrationValue" class="control-value">0.055 s⁻¹</span></label><input id="dragCalibration" type="range" min="0" max="0.20" step="0.0025" value="0.055"><div class="hint">Set to zero for ideal projectile motion. Wind only bends the path when aerodynamic coupling exists.</div></div>
-<div class="control-row"><label class="control-label" for="headWind"><span>Head / tail wind</span><span id="headWindValue" class="control-value">0.0 mph</span></label><input id="headWind" type="range" min="-20" max="20" step="0.5" value="0"><div class="hint">Negative = headwind. Positive = tailwind.</div></div>
-<div class="control-row"><label class="control-label" for="crossWind"><span>Crosswind</span><span id="crossWindValue" class="control-value">0.0 mph</span></label><input id="crossWind" type="range" min="-20" max="20" step="0.5" value="0"><div class="hint">Negative = pushes left. Positive = pushes right.</div></div></section>
+  <div class="layout">
+    <section class="workspace">
+      <div class="toolbar">
+        <div class="view-buttons">
+          <button class="view-button active" data-view="all" type="button">All views</button>
+          <button class="view-button" data-view="pov" type="button">Player POV 3D</button>
+          <button class="view-button" data-view="top" type="button">Top X–Z</button>
+          <button class="view-button" data-view="side" type="button">Side X–Y</button>
+          <button class="view-button" data-view="end" type="button">End Z–Y</button>
+        </div>
+        <div class="play-controls">
+          <button id="playButton" class="action-button primary" type="button">▶ Animate</button>
+          <button id="resetButton" class="action-button" type="button">Reset</button>
+          <label class="compact-control">Speed
+            <select id="playbackSpeed">
+              <option value="0.25">0.25×</option>
+              <option value="0.5">0.5×</option>
+              <option value="0.75">0.75×</option>
+              <option value="1" selected>1×</option>
+              <option value="1.5">1.5×</option>
+              <option value="2">2×</option>
+            </select>
+          </label>
+          <label class="switch-row compact"><input id="loopPlayback" type="checkbox"><span>Loop</span></label>
+          <div class="scrubber-wrap"><input id="timeScrubber" type="range" min="0" max="1" step="0.001" value="0"><span id="timeReadout">0.00 s</span></div>
+        </div>
+      </div>
 
-<section class="control-group"><div class="section-title">Environment</div>
-<div class="two-col"><div class="control-row"><label class="control-label" for="temperature"><span>Temp °F</span></label><input id="temperature" type="number" min="-20" max="120" step="1" value="77"></div><div class="control-row"><label class="control-label" for="humidity"><span>Humidity %</span></label><input id="humidity" type="number" min="0" max="100" step="1" value="24"></div></div>
-<div class="two-col"><div class="control-row"><label class="control-label" for="elevation"><span>Elevation ft</span></label><input id="elevation" type="number" min="-1000" max="12000" step="50" value="1300"></div><div class="control-row"><label class="control-label" for="bagWeight"><span>Bag weight oz</span></label><input id="bagWeight" type="number" min="14" max="16.5" step="0.1" value="16"></div></div>
-<label class="switch-row"><input id="showIdeal" type="checkbox" checked><span>Show no-drag comparison</span></label></section>
-</aside></div>
+      <div id="views" class="views">
+        <article class="view pov selected" data-panel="pov">
+          <div class="view-head"><div class="view-title">Player POV: basic 3D perspective</div><div class="view-desc">Right- or left-hand release, target reticle, aim line, and animated bag</div></div>
+          <canvas id="povCanvas" width="1100" height="650" aria-label="Player point-of-view rendering of the cornhole throw"></canvas>
+          <div class="view-foot">This is a geometric training view, not a photorealistic camera simulation. The visible arc is intentionally emphasized so the release and aim relationship is easy to study.</div>
+        </article>
 
-<section class="info"><div class="info-grid"><div><h2>What happens to X speed?</h2><p id="xExplanation">In ideal projectile motion, gravity does not act along X, so Vx stays constant.</p><div class="equation">No drag: x(t) = x₀ + Vx₀t &nbsp; and &nbsp; Vx(t) = Vx₀</div></div><div><h2>What creates the parabola?</h2><p>Horizontal position advances while vertical velocity loses about 32.174 ft/s each second. Combining those motions produces the familiar arc.</p><div class="equation">y(t) = y₀ + Vy₀t − ½gt²</div></div><div class="warning"><h2>Wind model boundary</h2><p>Wind is modeled as a simplified aerodynamic coupling that nudges the bag’s horizontal velocity toward the wind velocity. It gives a useful theoretical curve, but it is not a full CFD-grade bag model.</p></div></div></section>
-<footer style="margin-top:14px;padding:14px;border:1px solid var(--border);border-radius:16px;background:var(--panel);color:var(--muted);font-size:.84rem;line-height:1.45">
-<strong style="color:var(--text)">Experimental model.</strong> Real bag behavior varies with construction, fill distribution, spin, orientation, flutter, gusts, board finish, humidity, and impact deformation. Use this as a training and exploration tool—not a promise from the universe.
-<div style="margin-top:8px"><a href="https://www.roguevalleycornhole.com/" style="color:var(--accent-3);font-weight:700">← Rogue Valley Cornhole</a></div>
-</footer>
+        <article class="view top selected" data-panel="top">
+          <div class="view-head"><div class="view-title">Top view: X–Z</div><div class="view-desc">Drag the orange impact point anywhere on the board</div></div>
+          <svg id="topSvg" viewBox="0 0 1000 430">
+            <defs><linearGradient id="topGrad" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--accent-4)"/><stop offset="50%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent-3)"/></linearGradient></defs>
+            <rect width="1000" height="430" rx="18" fill="var(--grass)"/><rect x="40" y="45" width="920" height="340" rx="14" fill="var(--court)" opacity=".85"/><line x1="60" y1="215" x2="940" y2="215" stroke="var(--grid)" stroke-width="2" stroke-dasharray="8 8"/><g id="topBoxes"></g><g id="topBoards"></g><g id="topGrid"></g>
+            <path id="topPathGlow" fill="none" stroke="url(#topGrad)" stroke-width="12" opacity=".20" stroke-linecap="round"/><path id="topPath" fill="none" stroke="url(#topGrad)" stroke-width="6" stroke-linecap="round"/><path id="topCenterReference" fill="none" stroke="var(--accent-2)" stroke-width="2" stroke-dasharray="8 7" opacity=".65"/>
+            <circle id="topRelease" r="8" fill="var(--accent-4)" stroke="var(--panel)" stroke-width="3"/><circle id="topImpactHit" class="impact-hit" r="24" fill="transparent"/><circle id="topImpact" class="impact-point" r="9" fill="var(--accent-3)" stroke="var(--panel)" stroke-width="3"/><circle id="topBag" r="10" fill="var(--accent)" stroke="var(--panel)" stroke-width="3"/><text id="topReleaseText" class="main-label">release</text><text id="topImpactText" class="main-label">impact</text><text x="500" y="414" text-anchor="middle" class="axis-label">X → forward travel</text><text x="20" y="215" text-anchor="middle" class="axis-label" transform="rotate(-90 20 215)">Z → left / right</text>
+          </svg>
+        </article>
+
+        <article class="view end selected" data-panel="end">
+          <div class="view-head"><div class="view-title">End view: Z–Y</div><div class="view-desc">Drag orange left/right to change target Z</div></div>
+          <svg id="endSvg" viewBox="0 0 680 430"><defs><linearGradient id="endGrad" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--accent-4)"/><stop offset="50%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent-3)"/></linearGradient></defs><rect width="680" height="430" rx="18" fill="var(--panel-2)"/><g id="endGrid"></g><line x1="60" y1="375" x2="640" y2="375" stroke="var(--text)" stroke-width="3"/><line x1="340" y1="25" x2="340" y2="390" stroke="var(--grid)" stroke-width="2" stroke-dasharray="7 7"/><g id="endBoard"></g><path id="endPathGlow" fill="none" stroke="url(#endGrad)" stroke-width="12" opacity=".20" stroke-linecap="round"/><path id="endPath" fill="none" stroke="url(#endGrad)" stroke-width="6" stroke-linecap="round"/><circle id="endRelease" r="8" fill="var(--accent-4)" stroke="var(--panel)" stroke-width="3"/><circle id="endImpactHit" class="impact-hit" r="24" fill="transparent"/><circle id="endImpact" class="impact-point" r="9" fill="var(--accent-3)" stroke="var(--panel)" stroke-width="3"/><circle id="endBag" r="10" fill="var(--accent)" stroke="var(--panel)" stroke-width="3"/><text x="340" y="415" text-anchor="middle" class="axis-label">Z → lateral position</text><text x="18" y="215" text-anchor="middle" class="axis-label" transform="rotate(-90 18 215)">Y → height</text></svg>
+        </article>
+
+        <article class="view side selected" data-panel="side">
+          <div class="view-head"><div class="view-title">Side view: X–Y</div><div class="view-desc">Drag orange along the board to change landing depth</div></div>
+          <svg id="sideSvg" viewBox="0 0 1000 500"><defs><linearGradient id="sideGrad" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="var(--accent-4)"/><stop offset="55%" stop-color="var(--accent)"/><stop offset="100%" stop-color="var(--accent-3)"/></linearGradient></defs><rect width="1000" height="500" rx="18" fill="var(--panel-2)"/><g id="sideGrid"></g><line x1="65" y1="435" x2="955" y2="435" stroke="var(--text)" stroke-width="3"/><line x1="65" y1="435" x2="65" y2="35" stroke="var(--text)" stroke-width="3"/><g id="sideBoard"></g><path id="sideIdealPath" fill="none" stroke="var(--accent-2)" stroke-width="3" stroke-dasharray="9 7" opacity=".75"/><path id="sidePathGlow" fill="none" stroke="url(#sideGrad)" stroke-width="12" opacity=".20" stroke-linecap="round"/><path id="sidePath" fill="none" stroke="url(#sideGrad)" stroke-width="6" stroke-linecap="round"/><circle id="sideRelease" r="8" fill="var(--accent-4)" stroke="var(--panel)" stroke-width="3"/><circle id="sideImpactHit" class="impact-hit" r="24" fill="transparent"/><circle id="sideImpact" class="impact-point" r="9" fill="var(--accent-3)" stroke="var(--panel)" stroke-width="3"/><circle id="sideApex" r="7" fill="var(--danger)" stroke="var(--panel)" stroke-width="3"/><circle id="sideBag" r="10" fill="var(--accent)" stroke="var(--panel)" stroke-width="3"/><g id="velocityArrows"></g><text x="510" y="482" text-anchor="middle" class="axis-label">X → forward distance</text><text x="20" y="245" text-anchor="middle" class="axis-label" transform="rotate(-90 20 245)">Y → height</text></svg>
+        </article>
+      </div>
+    </section>
+
+    <aside class="controls">
+      <section><div class="section-title">Throw geometry</div>
+        <div class="control-row"><label class="control-label" for="throwHand"><span>Throwing hand</span></label><select id="throwHand"><option value="right" selected>Right-handed POV</option><option value="left">Left-handed POV</option></select></div>
+        <div class="control-row"><label class="control-label" for="throwSide"><span>Pitcher’s box side</span></label><select id="throwSide"><option value="1">Right side of board</option><option value="-1">Left side of board</option></select></div>
+        <div class="control-row"><label class="control-label" for="boxPosition"><span>Position: inside → outside</span><span id="boxPositionValue" class="control-value">1.50 ft</span></label><input id="boxPosition" type="range" min="0" max="3" step="0.05" value="1.5"><div class="hint">0 = inside edge; 3 ft = outside edge of the 3-ft-wide box.</div></div>
+        <div class="control-row"><label class="control-label" for="handReach"><span>Hand past foul line</span><span id="handReachValue" class="control-value">1.50 ft</span></label><input id="handReach" type="range" min="-2" max="3" step="0.05" value="1.5"><div class="hint">Negative values place the release behind the foul line; positive values place it beyond the line.</div></div>
+        <div class="control-row"><label class="control-label" for="releaseHeight"><span>Release height Y</span><span id="releaseHeightValue" class="control-value">4.20 ft</span></label><input id="releaseHeight" type="range" min="2.5" max="6.5" step="0.05" value="4.2"></div>
+      </section>
+
+      <section class="control-group"><div class="section-title">Aim and timing</div>
+        <div class="control-row"><label class="control-label" for="targetDepth"><span>Landing depth on board</span><span id="targetDepthValue" class="control-value">2.75 ft</span></label><input id="targetDepth" type="range" min="0" max="4" step="0.05" value="2.75"><div class="hint">Measured from the board’s front edge. Hole center is 3.25 ft.</div></div>
+        <div class="control-row"><label class="control-label" for="targetZ"><span>Target Z on board</span><span id="targetZValue" class="control-value">0.00 ft</span></label><input id="targetZ" type="range" min="-1" max="1" step="0.025" value="0"><div class="hint">−1 ft = left edge; 0 = centerline; +1 ft = right edge.</div></div>
+        <div class="control-row"><label class="control-label" for="flightTime"><span>Flight time</span><span id="flightTimeValue" class="control-value">1.25 s</span></label><input id="flightTime" type="range" min="0.75" max="1.8" step="0.01" value="1.25"></div>
+      </section>
+
+      <section class="control-group"><div class="section-title">Air drag and wind</div>
+        <div class="control-row"><label class="control-label" for="dragCalibration"><span>Drag calibration</span><span id="dragCalibrationValue" class="control-value">0.055 s⁻¹</span></label><input id="dragCalibration" type="range" min="0" max="0.20" step="0.0025" value="0.055"><div class="hint">Set to zero for ideal projectile motion. Wind only bends the path when aerodynamic coupling exists.</div></div>
+        <div class="control-row"><label class="control-label" for="headWind"><span>Head / tail wind</span><span id="headWindValue" class="control-value">0.0 mph</span></label><input id="headWind" type="range" min="-20" max="20" step="0.5" value="0"><div class="hint">Negative = headwind. Positive = tailwind.</div></div>
+        <div class="control-row"><label class="control-label" for="crossWind"><span>Crosswind</span><span id="crossWindValue" class="control-value">0.0 mph</span></label><input id="crossWind" type="range" min="-20" max="20" step="0.5" value="0"><div class="hint">Negative = pushes left. Positive = pushes right.</div></div>
+      </section>
+
+      <section class="control-group"><div class="section-title">Environment</div>
+        <div class="two-col"><div class="control-row"><label class="control-label" for="temperature"><span>Temp °F</span></label><input id="temperature" type="number" min="-20" max="120" step="1" value="77"></div><div class="control-row"><label class="control-label" for="humidity"><span>Humidity %</span></label><input id="humidity" type="number" min="0" max="100" step="1" value="24"></div></div>
+        <div class="two-col"><div class="control-row"><label class="control-label" for="elevation"><span>Elevation ft</span></label><input id="elevation" type="number" min="-1000" max="12000" step="50" value="1300"></div><div class="control-row"><label class="control-label" for="bagWeight"><span>Bag weight oz</span></label><input id="bagWeight" type="number" min="14" max="16.5" step="0.1" value="16"></div></div>
+        <label class="switch-row"><input id="showIdeal" type="checkbox" checked><span>Show no-drag comparison</span></label>
+      </section>
+    </aside>
+  </div>
+
+  <section class="stats-panel" aria-label="Detailed numeric throw statistics">
+    <div class="stats-head"><div><h2>Detailed throw numbers</h2><p>Every value below updates with the sliders and draggable impact points.</p></div><div id="setupSummary" class="setup-summary"></div></div>
+    <div class="stats-grid">
+      <article class="stats-group"><h3>Release and aim</h3><dl id="releaseStats" class="stat-list"></dl></article>
+      <article class="stats-group"><h3>Flight and impact</h3><dl id="flightStats" class="stat-list"></dl></article>
+      <article class="stats-group"><h3>Air and model</h3><dl id="environmentStats" class="stat-list"></dl></article>
+    </div>
+  </section>
+
+  <section class="info"><div class="info-grid"><div><h2>What happens to X speed?</h2><p id="xExplanation">In ideal projectile motion, gravity does not act along X, so Vx stays constant.</p><div class="equation">No drag: x(t) = x₀ + Vx₀t &nbsp; and &nbsp; Vx(t) = Vx₀</div></div><div><h2>What creates the parabola?</h2><p>Horizontal position advances while vertical velocity loses about 32.174 ft/s each second. Combining those motions produces the familiar arc.</p><div class="equation">y(t) = y₀ + Vy₀t − ½gt²</div></div><div class="warning"><h2>POV boundary</h2><p>The player view uses a perspective projection and a simplified hand/arm overlay. It is useful for aim relationships, but it does not reproduce human vision, body mechanics, bag rotation, or a real camera lens.</p></div></div></section>
+
+  <footer><strong>Experimental model.</strong> Real bag behavior varies with construction, fill distribution, spin, orientation, flutter, gusts, board finish, humidity, and impact deformation. Use this as a training and exploration tool—not a promise from the universe.<div><a href="https://www.roguevalleycornhole.com/">← Rogue Valley Cornhole</a></div></footer>
 </main>
-
-<script src="app.js"></script></body></html>
+<script src="app.js"></script>
+</body>
+</html>
